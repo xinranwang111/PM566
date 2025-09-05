@@ -1,5 +1,6 @@
 # ignore the directory called data:
 data/
+*.html
 
 # ignore specific file (something.pdf)
 something.pdf
