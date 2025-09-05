@@ -1,0 +1,122 @@
+---
+title: "Lab1"
+author: "Xinran Wang"
+editor: visual
+format: 
+  html:
+    embed-resources: true
+fig-width: 8
+fig-height: 6
+theme: cosmos
+---
+
+## Running Code
+
+```{r}
+suppressPackageStartupMessages(library(datasauRus))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(tidyverse))
+```
+
+**Question1**\
+Based on the help file, how many rows and how many columns does the datasaurus_dozen file have? What are the variables included in the data frame? Add your responses to your lab report, with relevant code in the associated R code chunk, and free-form text outside of the code chunk.
+
+```{r}
+table(datasaurus_dozen$dataset)
+```
+
+**Question2**\
+Plot y vs. x for the dino dataset. Then, calculate the correlation coefficient between x and y for just this dataset.
+
+```{r}
+dino_data <- datasaurus_dozen[datasaurus_dozen$dataset == 'dino', ]
+
+plot(dino_data$x, dino_data$y)
+ggplot(data = dino_data, mapping = aes(x = x, y = y)) + geom_point()
+
+cor(dino_data$x, dino_data$y)
+dino_data |>
+    summarize(r = cor(x, y))
+```
+
+**Question3**\
+Now try it on your own! Plot y vs. x for the star dataset, another one of the datasaurus_dozen. You can (and should) re-use code we introduced above, just replace the dataset name with the desired dataset. Then, calculate the correlation coefficient between x and y for this dataset. How does this value compare to the r of dino?
+
+```{r}
+star_data <- datasaurus_dozen %>% filter(dataset == "star")
+ggplot(data = star_data, mapping = aes(x = x, y = y)) + geom_point()
+cor(star_data$x, star_data$y)
+star_data |>
+    summarize(r = cor(x, y))
+```
+
+**Question4**\
+Plot y vs. x for the circle dataset. You can (and should) reuse code we introduced above, just replace the dataset name with the desired dataset. Then, calculate the correlation coefficient between x and y for this dataset. How does this value compare to the r of dino?
+
+```{r}
+circle_data <- datasaurus_dozen %>% filter(dataset == "circle")
+ggplot(data = circle_data, mapping = aes(x = x, y = y)) + geom_point()
+cor(circle_data$x, circle_data$y)
+circle_data |>
+    summarize(r = cor(x, y))
+```
+
+**Question5**\
+Now let’s plot all 13 datasets at once. In order to do this we will make use of the layout function. This function allows you to put multiple plots in the same plotting window. We will create a 4x4 matrix containing the values 1 through 16 and pass this to layout, which lets it know where we want each plot to go (we only have 13 datasets, so there will be a few empty spots at the end). This may be too many plots for a small viewing window, so if you get the error message Error in plot.new() : figure margins too large, try making your plotting window larger.
+
+Then we use a for loop to perform a set of actions over every unique value of the dataset variable. This creates a new object, called name, that takes on each of those unique values, but it only exists within the context (interior) of the loop. Then we subset and plot the data, as we have before.
+
+The second call to layout will reset the plotting window, so that the next plot will take up the entire window, rather than 1/16th of it.
+
+Optional:If you really want to maximize the plotting area of this figure, you can also adjust the plotting margins via the par function (short for “graphical parameters”). The setting for margins is called mar and it takes a vector of length 4, specifying the bottom, left, top, and right margins, in order (the units are lines of text). You can set each margin to a value of 2 with par(mar = c(2,2,2,2)) and then reset to the default values with par(mar = c(5,4,4,2) + 0.1).
+
+```{r}
+#quartz(width=8, height=6)
+par(mar = c(2, 2, 2, 2))
+
+layout(matrix(1:16, nrow=4, ncol=4))
+for(name in unique(datasaurus_dozen$dataset)){
+  subset <- datasaurus_dozen[datasaurus_dozen$dataset == name, ]
+  plot(subset$x, subset$y, main = name)
+}
+layout(1)
+
+par(mar = c(5, 4, 4, 2) + 0.1)
+```
+
+```{r fig.width=15, fig.height=18}
+
+ggplot(datasaurus_dozen, aes(x = x, y = y, color = dataset))+
+  geom_point()+
+  facet_wrap(~ dataset, ncol = 3) +
+  theme(legend.position = "none")
+
+layout(1)
+
+```
+
+**Question6**\
+Finally, we want to calculate the correlation between the x and y variables for all 13 datasets. Like before, we will use a loop, but this time, since we want to return a specific value every time through the loop, we will use the sapply function. sapply is useful way to apply a function to every element of a vector. In this case, we provide the vector of unique dataset names (like before) and then our own custom function. This function subsets the data as before, and then returns the correlation coefficient as the output of the function.
+
+```{r}
+sapply(unique(datasaurus_dozen$dataset), function(name){
+    subset <- datasaurus_dozen[datasaurus_dozen$dataset == name, ]
+    return(cor(subset$x, subset$y))
+})
+
+datasaurus_dozen |>
+    group_by(dataset) |>
+    summarize(r = cor(x, y))
+```
+
+You’re now done with the data analysis exercises, but we’d like you to do two more things:
+
+Resize your figures:
+
+Add the fields fig-width and fig-height to the YAML header of your document. These will allow you to specify the size (in inches) of any figures generated by the code chunks in your report.
+
+You can also use different figure sizes for different figures. If you are in the Visual editor mode, switch to Source mode. Notice that each R chunk starts and ends with three backticks. Click on the gear icon in the top right of a code chunk and select “Use custom figure size” in the pop-up menu. Set the height and width of the figures and hit Apply when done. Then, render your document and see how you like the new sizes. Try making the plot for Question 5 larger, until you are happy with its size. Note that changing the figure sizes added new options to these chunks: fig.width and fig.height. You can change them by defining different values directly in your Quarto document as well.
+
+Change the look of your report:
+
+If you have time, you can explore the different ways you can add styling to your document. Try adding a theme field to the YAML header and see if you can find valid names of different themes.
