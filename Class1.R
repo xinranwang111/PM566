@@ -1,1 +1,0 @@
-/Users/xinranwang/Documents/Course/25Fall/PM566/Scripts/Class1.R
