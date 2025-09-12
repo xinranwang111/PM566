@@ -162,21 +162,26 @@ With the date-time variable we can plot the time series of temperature and wind 
 plot(elev$date, elev$temp, type='l')
 plot(elev$date, elev$wind.sp, type='l')
 ```
-
 -   Summarize any trends that you see in these time series plots.
 
+    [**Summary.** Overall, temperature fluctuates between 1°C and 15°C, reflecting daily variation. On August 11, the maximum temperature is relatively low at 8°C, compared to the surrounding days (see table below) ]{style="color:blue"}
+    
+    [**Summary.** Wind speed is relativly high in 8/9, 8/13-8/18, 8/24-8/26, and 8/31.  ]{style="color:blue"}
+    
+```{r}
+library(knitr)
+kable(elev %>% group_by(year, month, day) %>% summarize(min_temp = min(temp, na.rm = TRUE), max_temp=max(temp, na.rm = TRUE)))
+kable(elev %>% group_by(year, month, day) %>% summarize(min_wind.sp = min(wind.sp, na.rm = TRUE), max_wind.sp=max(wind.sp, na.rm = TRUE)))
+```
 
 ### **8. Ask questions**
 
 By now, you might have some specific questions about how the data was gathered and what some of the different variables and values mean. Alternatively, maybe you have an idea for how some of the variable should be related and you want to explore that relationship. In a real-world analysis, these questions could potentially be answered by a collaborator, who may have been part of the team that collected the data. What questions do you have about the data?
-
-```{r}
-# (1) Some response
-```
-
 
 If you haven’t already, now would be a good time to look at the accompanying [data dictionary](https://github.com/USCbiostats/data-science-data/blob/master/02_met/met-datadictionary.pdf) for this dataset and see if it can answer any of your questions. If you have questions about the nature of the dataset and how it was gathered, this might be able to help.
 
 For questions about variables in the dataset or relationships between them, try making some more exploratory plots. Do you see the patterns you would expect? There are many different types of summaries and visualization strategies that we have not discussed, but which could provide interesting perspectives on the data.
 
 Some other useful plotting functions include: - `pairs` for making all pairwise scatter plots in a dataset with \>2 dimensions. - `heatmap` and/or `corrplot` (from the `corrplot` package) for visualizing matrices in general or correlation matrices in particular. - `image` a low-level matrix visualization function - `barplot`, especially with `table`, for visualizing frequencies of categorical variables.
+
+
