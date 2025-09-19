@@ -10,10 +10,6 @@ fig-height: 6
 theme: cosmos
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
 ## Running Code
 
 ```{r}
@@ -162,12 +158,13 @@ With the date-time variable we can plot the time series of temperature and wind 
 plot(elev$date, elev$temp, type='l')
 plot(elev$date, elev$wind.sp, type='l')
 ```
+
 -   Summarize any trends that you see in these time series plots.
 
-    [**Summary.** Overall, temperature fluctuates between 1°C and 15°C, reflecting daily variation. On August 11, the maximum temperature is relatively low at 8°C, compared to the surrounding days (see table below) ]{style="color:blue"}
-    
-    [**Summary.** Wind speed is relativly high in 8/9, 8/13-8/18, 8/24-8/26, and 8/31.  ]{style="color:blue"}
-    
+    [**Summary.** Overall, temperature fluctuates between 1°C and 15°C, reflecting daily variation. On August 11, the maximum temperature is relatively low at 8°C, compared to the surrounding days (see table below)]{style="color:blue"}
+
+    [**Summary.** Wind speed is relativly high in 8/9, 8/13-8/18, 8/24-8/26, and 8/31.]{style="color:blue"}
+
 ```{r}
 library(knitr)
 kable(elev %>% group_by(year, month, day) %>% summarize(min_temp = min(temp, na.rm = TRUE), max_temp=max(temp, na.rm = TRUE)))
@@ -183,5 +180,3 @@ If you haven’t already, now would be a good time to look at the accompanying 
 For questions about variables in the dataset or relationships between them, try making some more exploratory plots. Do you see the patterns you would expect? There are many different types of summaries and visualization strategies that we have not discussed, but which could provide interesting perspectives on the data.
 
 Some other useful plotting functions include: - `pairs` for making all pairwise scatter plots in a dataset with \>2 dimensions. - `heatmap` and/or `corrplot` (from the `corrplot` package) for visualizing matrices in general or correlation matrices in particular. - `image` a low-level matrix visualization function - `barplot`, especially with `table`, for visualizing frequencies of categorical variables.
-
-
