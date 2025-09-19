@@ -56,3 +56,13 @@
   - Script
   - Output
 
+### Tidy Tuesday 
+##### Week 1: Billboard Hot 100 Number Ones
+<img src="https://github.com/xinranwang111/PM566/blob/main/tidytuesday/extra_credit1.png" width="600">  
+
+##### Week 2: Australian Frogs
+<img src="https://github.com/xinranwang111/PM566/blob/main/tidytuesday/extra_credit2.png" width="600">
+
+##### Week 3: Henley Passport Index Data
+<img src="https://github.com/xinranwang111/PM566/blob/main/tidytuesday/extra_credit3.png" width="600">  
+
