@@ -152,6 +152,12 @@ ggplot(data = met_daily, mapping = aes(x = lat, y = temp)) +
 rm(list = ls())
 
 ###############################################################
+# https://stackoverflow.com/questions/62867888/spatial-visualization-using-country-names-r
+library(ggplot2)
+library(scales)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
 
 tuesdata <- tidytuesdayR::tt_load(2025, week = 36) 
 
@@ -159,10 +165,25 @@ countnry_lists <- tuesdata$countnry_lists
 rank_by_year <- tuesdata$rank_by_year
 
 table(rank_by_year$year)
+nrow(rank_by_year)
 
+#
+rank_by_year <- rank_by_year %>% filter(year == c(2010, 2025))
 
+world <- ne_countries(scale = "medium", returnclass = "sf")
+rank.world <- merge(world, rank_by_year, by.x="admin", by.y="country")
 
-
+p <- ggplot(data = rank.world) + 
+  geom_sf(aes(fill=rank)) +
+  scale_fill_gradient(low = "lightblue", 
+                      high = "pink1",
+                      label = comma, 
+                      name = "Rank") +
+  labs(title = "World Visa Rankings in 2010 vs. 2025") +
+  theme_minimal() +
+  theme(strip.text = element_text(size = 12)) +
+  facet_wrap(~ year, nrow = 2, strip.position = "bottom")
+ggsave(paste0(odir, "/extra_credit3.png"), p, width = 8, height = 6)
 
 
 
