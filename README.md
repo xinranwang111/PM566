@@ -1,6 +1,6 @@
 # PM566
 
-Labs
+### Labs
 - Lab 1
   - [Script](https://github.com/xinranwang111/PM566/blob/main/Lab1.qmd)
   - [Output](https://github.com/xinranwang111/PM566/blob/main/Lab1.html)
@@ -34,7 +34,7 @@ Labs
   - Script
   - Output
 
-Assignments
+### Assignments
 - Assignment 1
   - [Script](https://github.com/xinranwang111/PM566/blob/main/Assignment1.qmd)
   - [Output](https://github.com/xinranwang111/PM566/blob/main/Assignment1.html)
@@ -48,7 +48,7 @@ Assignments
   - Script
   - Output
 
-Midterm & Final
+### Midterm & Final
 - Midterm
   - Script
   - Output
