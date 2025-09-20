@@ -66,3 +66,5 @@
 ##### Week 3: Henley Passport Index Data
 <img src="https://github.com/xinranwang111/PM566/blob/main/tidytuesday/extra_credit3.png" width="600">  
 
+##### Week 4: Allrecipes
+<img src="https://github.com/xinranwang111/PM566/blob/main/tidytuesday/extra_credit4.png" width="600">  
