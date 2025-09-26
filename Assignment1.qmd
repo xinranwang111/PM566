@@ -19,6 +19,8 @@ suppressPackageStartupMessages(library(data.table))
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(datasauRus))
 
+suppressPackageStartupMessages(library(skimr))
+
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(ggthemes))
 suppressPackageStartupMessages(library(ggpubr))
@@ -35,38 +37,48 @@ idir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
 
 1.  (30 points) Given the formulated question from the assignment description, you will now conduct EDA Checklist items 1-5. First, download 2002 and 2022 data for all sites in California from the [EPA Air Quality Data website](https://www.epa.gov/outdoor-air-quality-data/download-daily-data), then read the data into R. For each of the two datasets, check the dimensions, headers, footers, variable names and variable types. Check the distribution of the key variable we are analyzing (PM). Write up a summary of all of your findings.
 
-    [**Summary.** This data frame includes measurements at the state level (California), county level (51 counties), and city level (199 monitoring sites). PM2.5 was recorded using 21 different methods (see Method.Description for details) and reported in units of µg/m3 LC. ]{style="color:blue"}
-    
+    [**Note.** Since `skim` collapse all number into `numeric`, I also attached a table to distinguish between numerical types]{style="color:blue"}
+
+    [**Summary.** This data frame includes measurements at the state level (California), county level (51 counties), and city level (199 monitoring sites). PM2.5 was recorded using 21 different methods (see `Method.Description` column for details) and reported in units of µg/m3 LC. Other parameters such as daily AQI level, AQS code and description, CBSA code and name, etc. are also available.]{style="color:blue"}
+
+    [There is a striking decrease in daily PM2.5 concentrations from 2002 to 2022. Mean and median PM 2.5 were cut in half. However, there are more outliers in 2022 and max PM 2.5 increased by 3 fold.]{style="color:blue"}
+
     ```{r}
-    read_and_check <- function(idir, filename, year){
+    read_df <- function(idir, filename, year){
       df <- read.csv(paste0(idir, "/", filename)) %>% mutate(Year = year)
+      return(df)
+    }
+    ```
+
+    ```{r}
+    check_df <- function(df){
       print(paste0("Dimension: ", paste(dim(df), collapse = " x "),
                    "; # Rows: ", nrow(df), 
                    "; # Columns: ", ncol(df)))
       
-      print(paste0("Variables names: ", paste(colnames(df), collapse = ", ")))
-      
-      print("Variable structures: ")
-      str(df)
-      
-      return(df)
+      df_type <- data.frame(Type = sapply(df, function(x) paste(class(x), collapse = ", ")))
+      kable(df_type, caption = "Variable types in df")
     }
     ```
 
     ## 2002
 
     ```{r}
-    df_2002 <- read_and_check(idir, "ad_viz_plotval_data_PM2.5_2002.csv", "2002")
-    kable(head(df_2002, 1), align = "c")
-    kable(tail(df_2002, 1), align = "c")
+    df_2002 <- read_df(idir, "ad_viz_plotval_data_PM2.5_2002.csv", "2002")
+    check_df(df_2002)
+    skim(df_2002)
+    kable(head(df_2002, 1), caption = "Head of df")
+    kable(tail(df_2002, 1), caption = "Tail of df")
     ```
 
     ## 2022
 
     ```{r}
-    df_2022 <- read_and_check(idir, "ad_viz_plotval_data_PM2.5_2022.csv", "2022")
-    kable(head(df_2022, 1), align = "c")
-    kable(tail(df_2022, 1), align = "c")
+    df_2022 <- read_df(idir, "ad_viz_plotval_data_PM2.5_2022.csv", "2022")
+    check_df(df_2022)
+    skim(df_2022)
+    kable(head(df_2022, 1), caption = "Head of df")
+    kable(tail(df_2022, 1), caption = "Tail of df")
     ```
 
     ```{r}
@@ -81,12 +93,12 @@ idir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
     ```
 
     ## Distribution of PM 2.5
-    [**Summary.** There is a striking decrease in daily PM2.5 concentrations from 2002 to 2022. Mean and median PM 2.5 were cut in half. However, there are more outliers in 2022 and max PM 2.5 increased by 3 fold]{style="color:blue"}
+
     ```{r}
     df <- df %>% rename(PM2.5 = Daily.Mean.PM2.5.Concentration) 
     df$Year <- factor(df$Year, levels = c("2002", "2022"))
 
-    summary1 <- df %>% 
+    summary_pm2.5 <- df %>% 
       group_by(Year) %>%
       summarise(
         mean          = round(mean(PM2.5, na.rm = T), 2), 
@@ -97,18 +109,22 @@ idir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
         q75           = quantile(PM2.5, 0.75, na.rm = TRUE),
         max           = max(PM2.5, na.rm = TRUE)
       ) 
-    kable(as.data.frame(summary1), align = "c")
+    kable(as.data.frame(summary_pm2.5), align = "c")
 
     ```
 
 2.  (10 points) Combine the two years of data into one data frame. Use the `Date` variable to create a new column for year, which will serve as an identifier. Change the names of the key variables so that they are easier to refer to in your code.
 
-    [**Note.** (1) I've created new column for year when reading data, (2) I've renamed Daily.Mean.PM2.5.Concentration to PM2.5 in previous step (3) I've combined data in previous step (before plotting).]{style="color:blue"}
+    [**Note.** (1) I've created new column for year when reading data, (2) I've renamed Daily.Mean.PM2.5.Concentration to PM2.5 in previous step (3) I've combined data in previous step.]{style="color:blue"}
 
 3.  (20 points) Create a basic map (or maps) in `leaflet` showing the locations of the monitoring sites, using different colors for each year. Summarize the spatial distribution of the sites. How does this distribution change from 2002 to 2022?
 
     ## Map (2002 vs 2022)
-    [**Summary.** By 2022, more sites had been established, frequently clustering near the 2002 sites (see map above). The number of sites increased 3.75-fold from 2002 to 2022 (rising from 15,978 to 59,918 sites; see histrogram and table in Question 4).]{style="color:blue"}
+
+    [**Summary.** By 2022, more sites had been established, frequently clustering near the 2002 sites (see map above). The number of sites increased by 60% (from 103 to 165) and the number of observations increased 3.75-fold from 2002 to 2022 (rising from 15,978 to 59,918 observations; see histogram and table in Question 4).]{style="color:blue"}
+
+    <https://rdrr.io/cran/leaflet.extras2/man/addSidebyside.html>
+
     ```{r}
     # Map
     #scales::hue_pal()(2)
@@ -137,6 +153,7 @@ idir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
                  radius = 100,
                  options = pathOptions(pane = "left"),
                  group = "2002") %>%
+      
       addCircles(data = df %>% filter(Year == 2022),
                  lat = ~Site.Latitude,
                  lng = ~Site.Longitude,
@@ -162,8 +179,6 @@ idir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
           layerId = "sidecontrols",
           leftId = "layer_2002",
           rightId = "layer_2022")
-
-    #https://rdrr.io/cran/leaflet.extras2/man/addSidebyside.html
     ```
 
 4.  (10 points) Check for any data issues such as missing or implausible values of PM in the combined dataset. Calculate the proportion of missing/implausible values for each year and report any temporal patterns you see in these observations.
@@ -172,10 +187,10 @@ idir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
 
     [**Implausible values.** In 2022, 215 out of 59,918 observations (0.36%) were implausible (defined as PM2.5 \< 0).]{style="color:blue"}
 
-    [**Temporal Patterns.** The number of implausible observations increased in 2022, although the count remained very small overall).]{style="color:blue"}
-    
+    [**Temporal Patterns.** The number of implausible observations increased in 2022, although the count remained very small overall.]{style="color:blue"}
+
     ```{r}
-    summary2 <- df %>% 
+    summary_missingness <- df %>% 
       group_by(Year) %>%
       summarise(
         `# Total`          = n(),
@@ -187,7 +202,7 @@ idir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
         `% Implausible` = paste0(round((`# Implausible` / `# Total`) * 100, 2), "%")) %>%
       select(`# Total`, `# Missing`, `% Missing`, `# Implausible`, `% Implausible`)
 
-    kable(as.data.frame(summary2), align = "c")
+    kable(as.data.frame(summary_missingness), align = "c")
 
     # Count of PM 2.5 Concentration
     df$Year <- factor(df$Year, levels = c("2022", "2002"))  # 2002 will be drawn last (on top)
@@ -195,13 +210,13 @@ idir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
       geom_histogram(bins = 100, alpha = 0.5, position = "identity") + 
       labs(title = "Histrogram of Daily PM 2.5 Concentration", 
            x = "PM2.5 Concentration",
-           y = "Count") +
+           y = "Count Observation") +
       scale_color_manual(name = "Year",
                          values = c("2002" = "#F8766D", "2022" = "#00BFC4")) +
       scale_fill_manual(name = "Year",
                          values = c("2002" = "#F8766D", "2022" = "#00BFC4")) +
       theme_classic()
-    
+
     df$Year <- factor(df$Year, levels = c("2002", "2022"))  # 2002 will be drawn last (on top)
     ```
 
@@ -214,9 +229,11 @@ idir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
 -   Level 3: City. Restrict the data to sites in Los Angeles county and examine the primary question for every site.
 
     ## Level 1: State
-    [**Summary. **The mean of daily PM 2.5 in 2022 (mean: 8.41; sd: 7.64) is lower than than 2002 (mean: 16.12; sd: 13.87), despite more outliers. ]{style="color:blue"}
+
+    [**Summary.** The mean of daily PM 2.5 in 2022 (mean: 8.41; sd: 7.64) is lower than than 2002 (mean: 16.12; sd: 13.87), suggesting long term improvements in air quality. The increase in amount and magnitude of outliers likely reflect wildfire in 2022.]{style="color:blue"}
+
     ```{r}
-    summary3 <- df %>% 
+    summary_byState <- df %>% 
       group_by(Year) %>%
       summarise(
         n             = n(),
@@ -225,7 +242,7 @@ idir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
       mutate(`Mean (SD)`= paste0(mean, " (", sd, ")")) %>%
       select(Year, `Mean (SD)`) %>%
       arrange(Year)
-    kable(as.data.frame(summary3), align = "c")
+    kable(as.data.frame(summary_byState), align = "c")
 
     ggplot(df, aes_string(x = "Year", y = "PM2.5", fill = "Year", color = "Year")) +
       geom_boxplot(color = "black", size = 0.2) +
@@ -239,11 +256,15 @@ idir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
             legend.box = "horizontal",
             legend.justification = "center")
     ```
-    
+
     ## Level 2: County
-    [**Summary. **The mean of daily PM 2.5 for most counties in California in 2022 are lower than that of 2000, except for Trinity, Siskiyou, Mono, and Del Norte.]{style="color:blue"}
+
+    [**Summary.** Counties in California show decreasing trends in PM 2.5 between 2002 and 2022. The reductions are particularly notable in Riverside, Butte, Kern,San Francisco, Tulare, Merced, and San Joaquin, where PM 2.5 dropped by more than 50%.]{style="color:blue"}
+
+    [However, not every county follow this trend. Mono, Nevada, Mendocino, and Del Norte showed a slightly increase in PM2.5 (below 2% increase), where as Trinity and Siskiyou shows striking increase (285.97% and 182.53%, respectly).]{style="color:blue"}
+
     ```{r fig.height=10, fig.width=7}
-    summary4 <- df %>% 
+    summary_byCounty <- df %>% 
       group_by(County, Year) %>%
       summarise(
         n             = n(),
@@ -255,8 +276,15 @@ idir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
         names_from = Year, 
         values_from = `Mean (SD)`, 
         names_prefix = "Mean (SD) in ") %>%
-      select(County, `Mean (SD) in 2002`, `Mean (SD) in 2022`) 
-    kable(as.data.frame(summary4), align = "c")
+      mutate(mean_2002 = as.numeric(str_extract(`Mean (SD) in 2002`, "^[0-9.]+")),
+             mean_2022 = as.numeric(str_extract(`Mean (SD) in 2022`, "^[0-9.]+")),
+             `Difference in Mean (2022 - 2002)` = (mean_2022 - mean_2002), 
+             `% Change in Mean (2022 - 2002)` = round(((mean_2022 - mean_2002)/mean_2002)*100, 2)) %>%
+      arrange(`% Change in Mean (2022 - 2002)`) %>%
+      mutate(`Difference (% Change)` = paste0(`Difference in Mean (2022 - 2002)`, " (", `% Change in Mean (2022 - 2002)`, "%)")) %>%
+      select(County, `Mean (SD) in 2002`, `Mean (SD) in 2022`, `Difference (% Change)`)
+
+    kable(as.data.frame(summary_byCounty), align = "c")
 
     df_couty <- df %>% group_by(Year, County) %>% 
       summarise(
@@ -284,54 +312,64 @@ idir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
     ```
 
     ## Level 3: Sites in LA County
-    [**Summary. ** The mean of daily PM 2.5 for all cities in Los Angeles county in 2022 are lower than that of 2000]{style="color:blue"}
-```{r fig.height=10, fig.width=7}
 
-  summary5 <- df %>% 
-           filter(County == "Los Angeles", 
-                  Year %in% c("2002", "2022"),
-                  Local.Site.Name != "") %>%
-      group_by(Year, Local.Site.Name) %>%
-      summarise(
-        n             = n(),
-        mean          = round(mean(PM2.5, na.rm = T), 2), 
-        sd            = round(sd(PM2.5, na.rm = TRUE), 2)) %>%
-      mutate(`Mean (SD)`= paste0(mean, " (", sd, ")")) %>%
-      select(Year, Local.Site.Name, `Mean (SD)`) %>%
-      pivot_wider(
-        names_from = Year, 
-        values_from = `Mean (SD)`, 
-        names_prefix = "Mean (SD) in ") %>%
-      mutate(`Local Site Name` = Local.Site.Name) %>%
-      select(`Local Site Name`, `Mean (SD) in 2002`, `Mean (SD) in 2022`) %>%
-      arrange(`Local Site Name`) 
-  kable(as.data.frame(summary5), align = "c")
-    
-  ggplot(df %>% 
-           filter(County == "Los Angeles", 
-                  Year %in% c("2002", "2022"),
-                  Local.Site.Name != ""), 
-       aes(x = PM2.5,
-           y = Local.Site.Name,
-           fill = Year)) +
-  geom_violin(alpha = 0.6, scale = "width", 
-              position = position_dodge(width = 0.8), trim = FALSE) +
-  labs(
-    title = "Daily PM2.5 Concentration in LA County",
-    subtitle = "By monitoring sites (2002 vs 2022)",
-    x = "Daily PM2.5 Concentration",
-    y = "Site",
-    fill = "Year") +
-  scale_color_manual(name = "Year",
-                         values = c("2002" = "#F8766D", "2022" = "#00BFC4")) +
-  scale_fill_manual(name = "Year",
-                         values = c("2002" = "#F8766D", "2022" = "#00BFC4")) +
-  theme_minimal() +
-  theme(
-    legend.position = "bottom",
-    legend.box = "horizontal",
-    legend.justification = "center"
-  )
-```
+    [**Summary.** The sites in LA county shows a clear decline in daily PM 2.5 levels between 2002 and 2022. All sites (that existed in both 2002 and 2022) showed at least 27.39% reduction in PM 2.5 levels. The reduction is particularly notable in Pasadena and Azusa, where mean daily PM 2.5 dropped more than 50%.]{style="color:blue"}
+
+    [The violin plot showed that the distribution of PM 2.5 in 2022 is generally wider at lower PM 2.5 levels than 2002, indicating a decreasing trend.]{style="color:blue"}
+
+    ```{r fig.height=10, fig.width=7}
+
+      summary_bySite <- df %>% 
+               filter(County == "Los Angeles", 
+                      Year %in% c("2002", "2022"),
+                      Local.Site.Name != "") %>%
+          group_by(Year, Local.Site.Name) %>%
+          summarise(
+            n             = n(),
+            mean          = round(mean(PM2.5, na.rm = T), 2), 
+            sd            = round(sd(PM2.5, na.rm = TRUE), 2)) %>%
+          mutate(`Mean (SD)`= paste0(mean, " (", sd, ")")) %>%
+          select(Year, Local.Site.Name, `Mean (SD)`) %>%
+          pivot_wider(
+            names_from = Year, 
+            values_from = `Mean (SD)`, 
+            names_prefix = "Mean (SD) in ") %>%
+          mutate(`Local Site Name` = Local.Site.Name) %>%
+          mutate(mean_2002 = as.numeric(str_extract(`Mean (SD) in 2002`, "^[0-9.]+")),
+                 mean_2022 = as.numeric(str_extract(`Mean (SD) in 2022`, "^[0-9.]+")),
+                `Difference in Mean (2022 - 2002)` = (mean_2022 - mean_2002), 
+                `% Change in Mean (2022 - 2002)` = round(((mean_2022 - mean_2002)/mean_2002)*100, 2)) %>%
+        arrange(`% Change in Mean (2022 - 2002)`) %>%
+        mutate(`Difference (% Change)` = paste0(`Difference in Mean (2022 - 2002)`, " (", `% Change in Mean (2022 - 2002)`, "%)")) %>%
+        select(Local.Site.Name, `Mean (SD) in 2002`, `Mean (SD) in 2022`, `Difference (% Change)`)
+
+      kable(as.data.frame(summary_bySite), align = "c")
+        
+      ggplot(df %>% 
+               filter(County == "Los Angeles", 
+                      Year %in% c("2002", "2022"),
+                      Local.Site.Name != ""), 
+           aes(x = PM2.5,
+               y = Local.Site.Name,
+               fill = Year)) +
+      geom_violin(alpha = 0.6, scale = "width", 
+                  position = position_dodge(width = 0.8), trim = FALSE) +
+      labs(
+        title = "Daily PM2.5 Concentration in LA County",
+        subtitle = "By monitoring sites (2002 vs 2022)",
+        x = "Daily PM2.5 Concentration",
+        y = "Site",
+        fill = "Year") +
+      scale_color_manual(name = "Year",
+                             values = c("2002" = "#F8766D", "2022" = "#00BFC4")) +
+      scale_fill_manual(name = "Year",
+                             values = c("2002" = "#F8766D", "2022" = "#00BFC4")) +
+      theme_minimal() +
+      theme(
+        legend.position = "bottom",
+        legend.box = "horizontal",
+        legend.justification = "center"
+      )
+    ```
 
 Reminder: after you upload your final rendered document to GitHub, you should download it to make sure that it looks right! If you haven’t included `embed-resources: true` in the YAML header, none of your figures will show up!
