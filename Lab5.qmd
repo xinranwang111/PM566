@@ -1,0 +1,312 @@
+---
+title: "Lab5"
+author: "Xinran Wang"
+format: html
+editor: visual
+---
+
+## Running Code
+
+```{r}
+suppressPackageStartupMessages(library(data.table))
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(knitr))
+
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(ggthemes))
+suppressPackageStartupMessages(library(ggpubr))
+
+suppressPackageStartupMessages(library(leaflet))
+suppressPackageStartupMessages(library(leaflet.extras2))
+```
+
+```{r}
+dir <-  "/Users/xinranwang/Documents/Course/25Fall/PM566"
+
+idir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
+sdir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Scripts"
+
+odir <- paste0(dir, "/Output")
+invisible(suppressMessages(suppressWarnings((dir.create(odir, recursive = TRUE)))))
+
+infile <- "met_all.gz"
+```
+
+```{r}
+# Download the data
+stations <- read.csv("https://noaa-isd-pds.s3.amazonaws.com/isd-history.csv")
+stations$USAF <- as.integer(stations$USAF)
+
+# Dealing with blanks and 999999
+stations$USAF[stations$USAF == 999999] <- NA
+stations$CTRY[stations$CTRY == ""] <- NA
+stations$STATE[stations$STATE == ""] <- NA
+
+# Selecting the three relevant columns, and keeping unique records
+stations <- unique(stations[, c('USAF', 'CTRY', 'STATE')])
+
+# Dropping NAs
+stations <- stations[!is.na(stations$USAF), ]
+
+# Removing duplicates
+stations <- stations[!duplicated(stations$USAF), ]
+```
+
+```{r}
+met <- fread(paste0(idir, "/", infile))
+met <- met[met$temp > -17 | is.na(met$temp), ]
+met$selev [met$elev == 9999.0] <- NA
+met$week <- as.numeric(format(as.Date(paste(met$year, met$month, met$day, sep = "-")), "%U"))
+
+met <- met[met$week == min(met$week, na.rm = TRUE),]
+met_avg <- aggregate(cbind(temp, rh, wind.sp, vis.dist, dew.point, lat, lon, elev, atm.press)
+                     ~ USAFID, data = met, FUN = mean, na.rm = TRUE)
+
+met_avg$region <- ifelse(met_avg$lon > -98 & met_avg$lat > 39.71, "north east" ,
+                         ifelse(met_avg$lon > -98 & met_avg$lat < 39.71, "south east", 
+                                ifelse(met_avg$lon < -98 & met_avg$lat > 39.71, "north west", "south west")))
+met_avg$elev_cat <- ifelse(met_avg$elev > 252, "high", "low")
+```
+
+```{r}
+df <- merge(
+  # Data
+  x     = met_avg,      
+  y     = stations, 
+  # List of variables to match
+  by.x  = "USAFID",
+  by.y  = "USAF", 
+  # Which obs to keep?
+  all.x = TRUE,      
+  all.y = FALSE
+  ) 
+
+rm(met, stations)
+```
+
+## **Question 1: Representative station for the US**
+
+What is the median station in terms of temperature, wind speed, and atmospheric pressure? Look for the three weather stations that best represent continental US using the `quantile()` function. Do these three coincide?
+
+[**Description.** The median station are 724280, 720377, 722197, for temperature, wind speed, and atmospheric pressure. They do not coincide.]{style="color:blue"}
+
+```{r}
+get_station <- function(df, x){
+  median.x <- quantile(df[[x]], 0.5, na.rm = TRUE)
+  station.x <- df$USAFID[which.min(abs(df[[x]] - median.x))]
+  return(station.x)
+}
+```
+
+```{r}
+print(paste0("Station with median temperature: ", get_station(df, "temp")))
+print(paste0("Station with median wind speed: ", get_station(df, "wind.sp")))
+print(paste0("Station with median atmospheric pressure: ", get_station(df, "atm.press")))
+```
+
+## **Question 2: Representative station per state**
+
+As in the previous question, calculate the median latitude and longitude for stations in each state.
+
+```{r}
+summary_byState_median <- df %>%
+  group_by(STATE) %>%
+  summarize(median.lat = median(lat),
+         median.lon = median(lon),
+         station.median.lat = df$USAFID[which.min(abs(lat - median.lat))],
+         station.median.lon = df$USAFID[which.min(abs(lon - median.lon))], 
+         station.median = df$USAFID[which.min((df$lon - median.lon)^2 + (df$lat - median.lat)^2)]) %>%
+  rename(State = STATE,
+         `Median Latitude` = median.lat, 
+         `Median Longitude` = median.lon, 
+         `Station Closest to Median Latitude` = station.median.lat, 
+         `Station Closest to Median Longitude` = station.median.lon,
+         `Station Closest to Median Latitude and Longitude` = station.median) %>%
+  ungroup()
+kable(summary_byState_median)
+```
+
+## **Question 3: In the middle?**
+
+For each state, identify the station that is closest to the mean latitude and longitude for stations in that state. Combining these with the coordinates you identified in the previous question, use `leaflet()` to visualize all \~100 points in the same figure, applying different colors for those identified in this question.
+
+```{r}
+summary_byState_overall <- df %>%
+  group_by(STATE) %>%
+  summarize(median.lat = median(lat),
+            median.lon = median(lon),
+            mean.lat = mean(lat), 
+            mean.lon = mean(lon),
+            station.median = df$USAFID[which.min((df$lon - median.lon)^2 + (df$lat - median.lat)^2)],
+            lat.station.median = df$lat[which.min((df$lon - median.lon)^2 + (df$lat - median.lat)^2)],
+            lon.station.median = df$lon[which.min((df$lon - median.lon)^2 + (df$lat - median.lat)^2)],
+            station.mean = df$USAFID[which.min((df$lon - mean.lon)^2 + (df$lat - mean.lat)^2)],
+            lat.station.mean = df$lat[which.min((df$lon - mean.lon)^2 + (df$lat - mean.lat)^2)],
+            lon.station.mean = df$lon[which.min((df$lon - mean.lon)^2 + (df$lat - mean.lat)^2)]) %>%
+  select(STATE, 
+         median.lat, median.lon,
+         station.median, lat.station.median, lon.station.median,
+         mean.lat, mean.lon,
+         station.mean,lat.station.mean,lon.station.mean) %>%
+  ungroup()
+
+summary_byState_mean <- summary_byState_overall %>%
+  select(STATE, 
+         station.mean, lat.station.mean, lon.station.mean) %>%
+  rename(State = STATE, 
+         Station = station.mean, 
+         Lat = lat.station.mean, 
+         Lon = lon.station.mean) %>%
+  mutate(Type = "mean")
+
+summary_byState_median <- summary_byState_overall %>%
+  select(STATE, 
+         station.median, lat.station.median, lon.station.median) %>%
+  rename(State = STATE, 
+         Station = station.median, 
+         Lat = lat.station.median, 
+         Lon = lon.station.median) %>%
+  mutate(Type = "median")
+
+summary_byState <- rbind(summary_byState_mean, summary_byState_median)
+```
+
+```{r}
+library(dplyr)
+library(leaflet)
+
+summary_byState <- summary_byState %>%
+  mutate(Type = factor(Type, levels = c("mean","median")))
+
+pal <- leaflet::colorFactor(
+  palette = c("#F8766D", "#00BFC4"),
+  domain  = levels(summary_byState$Type)  
+)
+
+leaflet(summary_byState) %>%
+  addMapPane("left",  zIndex = 410) %>% 
+  addMapPane("right", zIndex = 410) %>% 
+  addProviderTiles("OpenStreetMap", options = pathOptions(pane = "left"),  layerId = "layer_mean") %>%
+  addProviderTiles("OpenStreetMap", options = pathOptions(pane = "right"), layerId = "layer_median") %>%
+
+  addCircles(
+    data = filter(summary_byState, Type == "mean"),
+    lat = ~Lat, lng = ~Lon,
+    fillColor = ~pal(Type),
+    fillOpacity = 1,       
+    color = "black", weight = 0.5,
+    radius = 100,
+    options = pathOptions(pane = "left"),
+    group = "mean"
+  ) %>%
+
+  addCircles(
+    data = filter(summary_byState, Type == "median"),
+    lat = ~Lat, lng = ~Lon,
+    fillColor = ~pal(Type),
+    fillOpacity = 1,        
+    color = "black", weight = 0.5,
+    radius = 100,
+    options = pathOptions(pane = "right"),
+    group = "median"
+  ) %>%
+
+  addLegend(
+    "topright",
+    title = "Location of Sites",
+    pal = pal, values = ~Type, opacity = 1
+  ) %>%
+
+  addLayersControl(
+    overlayGroups = c("mean","median"),
+    options = layersControlOptions(collapsed = FALSE)
+  ) %>%
+
+  addSidebyside(
+    layerId = "sidecontrols",
+    leftId = "layer_mean",
+    rightId = "layer_median"
+  )
+```
+
+```{r}
+kable(summary_byState_overall %>%
+  select(STATE, median.lat, median.lon, lat.station.median, lon.station.median, station.median,
+         mean.lat, mean.lon, lat.station.mean, lon.station.mean, station.mean) %>%
+  rename(State = STATE,
+         `Median Latitude` = median.lat, 
+         `Median Longitude` = median.lon, 
+         `Latitude of Station Closest to Median` = lat.station.median, 
+         `Longitude Station Closest to Median` = lon.station.median,
+         `Station Closest to Median` = station.median, 
+         `Mean Latitude` = mean.lat, 
+         `Mean Longitude` = mean.lon, 
+         `Latitude of Station Closest to Mean` = lat.station.mean, 
+         `Longitude of Station Closest to Mean Longitude` = lon.station.mean, 
+         `Station Closest to Mean` = station.mean))
+```
+
+## **Question 4: Means of means**
+
+Compute each state’s average temperature and use that to classify them according to the following criteria:
+
+-   low: temp \< 20
+
+-   Mid: temp \>= 20 and temp \< 25
+
+-   High: temp \>= 25
+
+Now generate a large summary table with states/observations split into the three categories listed above. For each group, compute the following:
+
+-   Number of states
+
+-   Number of entries (records)
+
+-   Number of NA entries
+
+-   Number of stations
+
+-   Mean temperature
+
+-   Mean wind-speed
+
+-   Mean atmospheric pressure
+
+```{r}
+summary_byTemp <- df %>%
+  group_by(STATE) %>%
+  mutate(mean.temp = mean(temp, na.rm = T)) %>%
+  mutate(
+    temp.cat = case_when(
+      mean.temp < 20 ~ "low",
+      mean.temp >= 20  & mean.temp < 25 ~ "mid",
+      mean.temp >= 25 ~ "high",
+      TRUE ~ NA_character_
+    ) ) %>%
+  ungroup()
+```
+
+```{r}
+
+summary_final <- summary_byTemp %>%
+  mutate(temp.cat = factor(temp.cat, levels = c("low","mid", "high"))) %>%
+  group_by(temp.cat) %>%
+  summarize(num_state = length(unique(STATE)), 
+            num_entries = length(temp), 
+            num_NA_entries = sum(is.na(temp)), 
+            num_station = length(unique(USAFID)), 
+            mean_temp = mean(temp, na.rm = T), 
+            mean_wind_sp = mean(wind.sp, na.rm = T), 
+            mean_atm_pressure = mean(atm.press, na.rm = T)) %>%
+  rename(`Temperature Categories` = temp.cat, 
+         `Number of States` = num_state, 
+         `Number of Entries` = num_entries, 
+         `Number of NA Entries` = num_NA_entries, 
+         `Number of Stations` = num_station, 
+         `Mean Tempurature` = mean_temp, 
+         `Mean Wind Speed` = mean_wind_sp, 
+         `Mean Atmospheric Pressure` = mean_atm_pressure) %>%
+  ungroup()
+  
+kable(summary_final)
+```
