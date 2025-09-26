@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Xinran Wang">
+
+<title>Lab5</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Lab5_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Lab5_files/libs/quarto-html/quarto.js"></script>
+<script src="Lab5_files/libs/quarto-html/popper.min.js"></script>
+<script src="Lab5_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Lab5_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Lab5_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Lab5_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Lab5_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Lab5_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Lab5_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="Lab5_files/libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="Lab5_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="Lab5_files/libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="Lab5_files/libs/leaflet-1.3.1/leaflet.css" rel="stylesheet">
+<script src="Lab5_files/libs/leaflet-1.3.1/leaflet.js"></script>
+<link href="Lab5_files/libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet">
+<script src="Lab5_files/libs/proj4-2.6.2/proj4.min.js"></script>
+<script src="Lab5_files/libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+<link href="Lab5_files/libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
+<script src="Lab5_files/libs/leaflet-binding-2.2.2/leaflet.js"></script>
+<script src="Lab5_files/libs/leaflet-providers-2.0.0/leaflet-providers_2.0.0.js"></script>
+<script src="Lab5_files/libs/leaflet-providers-plugin-2.2.2/leaflet-providers-plugin.js"></script>
+<script src="Lab5_files/libs/lfx-sidebyside-1.0.0/lfx-side-by-side.js"></script>
+<script src="Lab5_files/libs/lfx-sidebyside-1.0.0/lfx-side-by-side-bindings.js"></script>
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Lab5</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Xinran Wang </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="running-code" class="level2">
+<h2 class="anchored" data-anchor-id="running-code">Running Code</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressPackageStartupMessages</span>(<span class="fu">library</span>(data.table))</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressPackageStartupMessages</span>(<span class="fu">library</span>(tidyverse))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressPackageStartupMessages</span>(<span class="fu">library</span>(knitr))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressPackageStartupMessages</span>(<span class="fu">library</span>(ggplot2))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressPackageStartupMessages</span>(<span class="fu">library</span>(ggthemes))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressPackageStartupMessages</span>(<span class="fu">library</span>(ggpubr))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressPackageStartupMessages</span>(<span class="fu">library</span>(leaflet))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressPackageStartupMessages</span>(<span class="fu">library</span>(leaflet.extras2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dir <span class="ot">&lt;-</span>  <span class="st">"/Users/xinranwang/Documents/Course/25Fall/PM566"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>idir <span class="ot">&lt;-</span> <span class="st">"/Users/xinranwang/Documents/Course/25Fall/PM566/Data"</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>sdir <span class="ot">&lt;-</span> <span class="st">"/Users/xinranwang/Documents/Course/25Fall/PM566/Scripts"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>odir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir, <span class="st">"/Output"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">suppressMessages</span>(<span class="fu">suppressWarnings</span>((<span class="fu">dir.create</span>(odir, <span class="at">recursive =</span> <span class="cn">TRUE</span>)))))</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>infile <span class="ot">&lt;-</span> <span class="st">"met_all.gz"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Download the data</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>stations <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://noaa-isd-pds.s3.amazonaws.com/isd-history.csv"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>stations<span class="sc">$</span>USAF <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(stations<span class="sc">$</span>USAF)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: NAs introduced by coercion</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dealing with blanks and 999999</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>stations<span class="sc">$</span>USAF[stations<span class="sc">$</span>USAF <span class="sc">==</span> <span class="dv">999999</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>stations<span class="sc">$</span>CTRY[stations<span class="sc">$</span>CTRY <span class="sc">==</span> <span class="st">""</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>stations<span class="sc">$</span>STATE[stations<span class="sc">$</span>STATE <span class="sc">==</span> <span class="st">""</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Selecting the three relevant columns, and keeping unique records</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>stations <span class="ot">&lt;-</span> <span class="fu">unique</span>(stations[, <span class="fu">c</span>(<span class="st">'USAF'</span>, <span class="st">'CTRY'</span>, <span class="st">'STATE'</span>)])</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Dropping NAs</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>stations <span class="ot">&lt;-</span> stations[<span class="sc">!</span><span class="fu">is.na</span>(stations<span class="sc">$</span>USAF), ]</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Removing duplicates</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>stations <span class="ot">&lt;-</span> stations[<span class="sc">!</span><span class="fu">duplicated</span>(stations<span class="sc">$</span>USAF), ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>met <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="fu">paste0</span>(idir, <span class="st">"/"</span>, infile))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>met <span class="ot">&lt;-</span> met[met<span class="sc">$</span>temp <span class="sc">&gt;</span> <span class="sc">-</span><span class="dv">17</span> <span class="sc">|</span> <span class="fu">is.na</span>(met<span class="sc">$</span>temp), ]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>met<span class="sc">$</span>selev [met<span class="sc">$</span>elev <span class="sc">==</span> <span class="fl">9999.0</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>met<span class="sc">$</span>week <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">format</span>(<span class="fu">as.Date</span>(<span class="fu">paste</span>(met<span class="sc">$</span>year, met<span class="sc">$</span>month, met<span class="sc">$</span>day, <span class="at">sep =</span> <span class="st">"-"</span>)), <span class="st">"%U"</span>))</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>met <span class="ot">&lt;-</span> met[met<span class="sc">$</span>week <span class="sc">==</span> <span class="fu">min</span>(met<span class="sc">$</span>week, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),]</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>met_avg <span class="ot">&lt;-</span> <span class="fu">aggregate</span>(<span class="fu">cbind</span>(temp, rh, wind.sp, vis.dist, dew.point, lat, lon, elev, atm.press)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                     <span class="sc">~</span> USAFID, <span class="at">data =</span> met, <span class="at">FUN =</span> mean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>met_avg<span class="sc">$</span>region <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(met_avg<span class="sc">$</span>lon <span class="sc">&gt;</span> <span class="sc">-</span><span class="dv">98</span> <span class="sc">&amp;</span> met_avg<span class="sc">$</span>lat <span class="sc">&gt;</span> <span class="fl">39.71</span>, <span class="st">"north east"</span> ,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">ifelse</span>(met_avg<span class="sc">$</span>lon <span class="sc">&gt;</span> <span class="sc">-</span><span class="dv">98</span> <span class="sc">&amp;</span> met_avg<span class="sc">$</span>lat <span class="sc">&lt;</span> <span class="fl">39.71</span>, <span class="st">"south east"</span>, </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">ifelse</span>(met_avg<span class="sc">$</span>lon <span class="sc">&lt;</span> <span class="sc">-</span><span class="dv">98</span> <span class="sc">&amp;</span> met_avg<span class="sc">$</span>lat <span class="sc">&gt;</span> <span class="fl">39.71</span>, <span class="st">"north west"</span>, <span class="st">"south west"</span>)))</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>met_avg<span class="sc">$</span>elev_cat <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(met_avg<span class="sc">$</span>elev <span class="sc">&gt;</span> <span class="dv">252</span>, <span class="st">"high"</span>, <span class="st">"low"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">merge</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Data</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x     =</span> met_avg,      </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">y     =</span> stations, </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># List of variables to match</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">by.x  =</span> <span class="st">"USAFID"</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">by.y  =</span> <span class="st">"USAF"</span>, </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Which obs to keep?</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">all.x =</span> <span class="cn">TRUE</span>,      </span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">all.y =</span> <span class="cn">FALSE</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  ) </span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(met, stations)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="question-1-representative-station-for-the-us" class="level2">
+<h2 class="anchored" data-anchor-id="question-1-representative-station-for-the-us"><strong>Question 1: Representative station for the US</strong></h2>
+<p>What is the median station in terms of temperature, wind speed, and atmospheric pressure? Look for the three weather stations that best represent continental US using the&nbsp;<code>quantile()</code>&nbsp;function. Do these three coincide?</p>
+<p><span style="color:blue"><strong>Description.</strong> The median station are 724280, 720377, 722197, for temperature, wind speed, and atmospheric pressure. They do not coincide.</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>get_station <span class="ot">&lt;-</span> <span class="cf">function</span>(df, x){</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  median.x <span class="ot">&lt;-</span> <span class="fu">quantile</span>(df[[x]], <span class="fl">0.5</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  station.x <span class="ot">&lt;-</span> df<span class="sc">$</span>USAFID[<span class="fu">which.min</span>(<span class="fu">abs</span>(df[[x]] <span class="sc">-</span> median.x))]</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(station.x)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">"Station with median temperature: "</span>, <span class="fu">get_station</span>(df, <span class="st">"temp"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Station with median temperature: 724280"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">"Station with median wind speed: "</span>, <span class="fu">get_station</span>(df, <span class="st">"wind.sp"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Station with median wind speed: 720377"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">"Station with median atmospheric pressure: "</span>, <span class="fu">get_station</span>(df, <span class="st">"atm.press"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Station with median atmospheric pressure: 722197"</code></pre>
+</div>
+</div>
+</section>
+<section id="question-2-representative-station-per-state" class="level2">
+<h2 class="anchored" data-anchor-id="question-2-representative-station-per-state"><strong>Question 2: Representative station per state</strong></h2>
+<p>As in the previous question, calculate the median latitude and longitude for stations in each state.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>summary_byState_median <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STATE) <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">median.lat =</span> <span class="fu">median</span>(lat),</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">median.lon =</span> <span class="fu">median</span>(lon),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">station.median.lat =</span> df<span class="sc">$</span>USAFID[<span class="fu">which.min</span>(<span class="fu">abs</span>(lat <span class="sc">-</span> median.lat))],</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">station.median.lon =</span> df<span class="sc">$</span>USAFID[<span class="fu">which.min</span>(<span class="fu">abs</span>(lon <span class="sc">-</span> median.lon))], </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">station.median =</span> df<span class="sc">$</span>USAFID[<span class="fu">which.min</span>((df<span class="sc">$</span>lon <span class="sc">-</span> median.lon)<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (df<span class="sc">$</span>lat <span class="sc">-</span> median.lat)<span class="sc">^</span><span class="dv">2</span>)]) <span class="sc">%&gt;%</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">State =</span> STATE,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Median Latitude</span><span class="st">`</span> <span class="ot">=</span> median.lat, </span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Median Longitude</span><span class="st">`</span> <span class="ot">=</span> median.lon, </span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Station Closest to Median Latitude</span><span class="st">`</span> <span class="ot">=</span> station.median.lat, </span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Station Closest to Median Longitude</span><span class="st">`</span> <span class="ot">=</span> station.median.lon,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Station Closest to Median Latitude and Longitude</span><span class="st">`</span> <span class="ot">=</span> station.median) <span class="sc">%&gt;%</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(summary_byState_median)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 3%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 22%">
+<col style="width: 22%">
+<col style="width: 30%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">State</th>
+<th style="text-align: right;">Median Latitude</th>
+<th style="text-align: right;">Median Longitude</th>
+<th style="text-align: right;">Station Closest to Median Latitude</th>
+<th style="text-align: right;">Station Closest to Median Longitude</th>
+<th style="text-align: right;">Station Closest to Median Latitude and Longitude</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">AL</td>
+<td style="text-align: right;">32.34150</td>
+<td style="text-align: right;">-86.50849</td>
+<td style="text-align: right;">720365</td>
+<td style="text-align: right;">720175</td>
+<td style="text-align: right;">722260</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">AR</td>
+<td style="text-align: right;">35.33300</td>
+<td style="text-align: right;">-92.47001</td>
+<td style="text-align: right;">720735</td>
+<td style="text-align: right;">720652</td>
+<td style="text-align: right;">723405</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">AZ</td>
+<td style="text-align: right;">33.54842</td>
+<td style="text-align: right;">-111.44743</td>
+<td style="text-align: right;">720379</td>
+<td style="text-align: right;">720498</td>
+<td style="text-align: right;">722783</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CA</td>
+<td style="text-align: right;">34.89914</td>
+<td style="text-align: right;">-119.20600</td>
+<td style="text-align: right;">722070</td>
+<td style="text-align: right;">722066</td>
+<td style="text-align: right;">723830</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CO</td>
+<td style="text-align: right;">39.23000</td>
+<td style="text-align: right;">-105.01579</td>
+<td style="text-align: right;">720383</td>
+<td style="text-align: right;">722011</td>
+<td style="text-align: right;">724666</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CT</td>
+<td style="text-align: right;">41.48278</td>
+<td style="text-align: right;">-72.82800</td>
+<td style="text-align: right;">720175</td>
+<td style="text-align: right;">690150</td>
+<td style="text-align: right;">725027</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DE</td>
+<td style="text-align: right;">39.13300</td>
+<td style="text-align: right;">-75.46700</td>
+<td style="text-align: right;">690150</td>
+<td style="text-align: right;">690150</td>
+<td style="text-align: right;">724088</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FL</td>
+<td style="text-align: right;">28.43374</td>
+<td style="text-align: right;">-81.77500</td>
+<td style="text-align: right;">720964</td>
+<td style="text-align: right;">720498</td>
+<td style="text-align: right;">722011</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">GA</td>
+<td style="text-align: right;">33.35508</td>
+<td style="text-align: right;">-83.83000</td>
+<td style="text-align: right;">720413</td>
+<td style="text-align: right;">720378</td>
+<td style="text-align: right;">722190</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">IA</td>
+<td style="text-align: right;">42.05106</td>
+<td style="text-align: right;">-93.12153</td>
+<td style="text-align: right;">720333</td>
+<td style="text-align: right;">720333</td>
+<td style="text-align: right;">725461</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ID</td>
+<td style="text-align: right;">43.56700</td>
+<td style="text-align: right;">-114.21500</td>
+<td style="text-align: right;">720365</td>
+<td style="text-align: right;">720175</td>
+<td style="text-align: right;">722142</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">IL</td>
+<td style="text-align: right;">40.04000</td>
+<td style="text-align: right;">-88.95000</td>
+<td style="text-align: right;">720377</td>
+<td style="text-align: right;">720334</td>
+<td style="text-align: right;">725316</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">IN</td>
+<td style="text-align: right;">40.23400</td>
+<td style="text-align: right;">-86.29600</td>
+<td style="text-align: right;">720407</td>
+<td style="text-align: right;">720362</td>
+<td style="text-align: right;">724387</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">KS</td>
+<td style="text-align: right;">38.57496</td>
+<td style="text-align: right;">-97.27100</td>
+<td style="text-align: right;">720407</td>
+<td style="text-align: right;">720361</td>
+<td style="text-align: right;">724586</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">KY</td>
+<td style="text-align: right;">37.85018</td>
+<td style="text-align: right;">-85.28353</td>
+<td style="text-align: right;">720377</td>
+<td style="text-align: right;">720361</td>
+<td style="text-align: right;">724233</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LA</td>
+<td style="text-align: right;">30.78003</td>
+<td style="text-align: right;">-92.01442</td>
+<td style="text-align: right;">720334</td>
+<td style="text-align: right;">720377</td>
+<td style="text-align: right;">722405</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MA</td>
+<td style="text-align: right;">42.13150</td>
+<td style="text-align: right;">-70.98270</td>
+<td style="text-align: right;">720369</td>
+<td style="text-align: right;">720333</td>
+<td style="text-align: right;">725098</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MD</td>
+<td style="text-align: right;">39.16706</td>
+<td style="text-align: right;">-76.42900</td>
+<td style="text-align: right;">690150</td>
+<td style="text-align: right;">720362</td>
+<td style="text-align: right;">724060</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ME</td>
+<td style="text-align: right;">44.31600</td>
+<td style="text-align: right;">-69.66700</td>
+<td style="text-align: right;">720377</td>
+<td style="text-align: right;">720333</td>
+<td style="text-align: right;">726185</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MI</td>
+<td style="text-align: right;">42.77465</td>
+<td style="text-align: right;">-84.67521</td>
+<td style="text-align: right;">720362</td>
+<td style="text-align: right;">720964</td>
+<td style="text-align: right;">725390</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MN</td>
+<td style="text-align: right;">44.83186</td>
+<td style="text-align: right;">-94.05100</td>
+<td style="text-align: right;">720365</td>
+<td style="text-align: right;">720175</td>
+<td style="text-align: right;">726579</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MO</td>
+<td style="text-align: right;">38.62400</td>
+<td style="text-align: right;">-92.38041</td>
+<td style="text-align: right;">720413</td>
+<td style="text-align: right;">720377</td>
+<td style="text-align: right;">724458</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MS</td>
+<td style="text-align: right;">32.33583</td>
+<td style="text-align: right;">-89.05173</td>
+<td style="text-align: right;">690150</td>
+<td style="text-align: right;">720306</td>
+<td style="text-align: right;">722340</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MT</td>
+<td style="text-align: right;">46.08138</td>
+<td style="text-align: right;">-108.99841</td>
+<td style="text-align: right;">720175</td>
+<td style="text-align: right;">720175</td>
+<td style="text-align: right;">726770</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NC</td>
+<td style="text-align: right;">35.19700</td>
+<td style="text-align: right;">-78.88000</td>
+<td style="text-align: right;">720964</td>
+<td style="text-align: right;">720334</td>
+<td style="text-align: right;">723030</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NE</td>
+<td style="text-align: right;">41.21428</td>
+<td style="text-align: right;">-98.97400</td>
+<td style="text-align: right;">720407</td>
+<td style="text-align: right;">720333</td>
+<td style="text-align: right;">725524</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NH</td>
+<td style="text-align: right;">43.27800</td>
+<td style="text-align: right;">-71.50224</td>
+<td style="text-align: right;">720306</td>
+<td style="text-align: right;">690150</td>
+<td style="text-align: right;">726050</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NJ</td>
+<td style="text-align: right;">40.10800</td>
+<td style="text-align: right;">-74.45850</td>
+<td style="text-align: right;">720361</td>
+<td style="text-align: right;">720362</td>
+<td style="text-align: right;">724090</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NM</td>
+<td style="text-align: right;">35.03975</td>
+<td style="text-align: right;">-105.14103</td>
+<td style="text-align: right;">720378</td>
+<td style="text-align: right;">720413</td>
+<td style="text-align: right;">722677</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NV</td>
+<td style="text-align: right;">39.29577</td>
+<td style="text-align: right;">-116.02564</td>
+<td style="text-align: right;">720361</td>
+<td style="text-align: right;">720306</td>
+<td style="text-align: right;">724860</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NY</td>
+<td style="text-align: right;">42.64300</td>
+<td style="text-align: right;">-75.41193</td>
+<td style="text-align: right;">720498</td>
+<td style="text-align: right;">720499</td>
+<td style="text-align: right;">725196</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OH</td>
+<td style="text-align: right;">40.70800</td>
+<td style="text-align: right;">-82.87821</td>
+<td style="text-align: right;">720379</td>
+<td style="text-align: right;">720306</td>
+<td style="text-align: right;">725208</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">OK</td>
+<td style="text-align: right;">35.53400</td>
+<td style="text-align: right;">-97.60075</td>
+<td style="text-align: right;">720377</td>
+<td style="text-align: right;">720361</td>
+<td style="text-align: right;">723544</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OR</td>
+<td style="text-align: right;">42.15667</td>
+<td style="text-align: right;">-123.11740</td>
+<td style="text-align: right;">720175</td>
+<td style="text-align: right;">720306</td>
+<td style="text-align: right;">725970</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PA</td>
+<td style="text-align: right;">40.46300</td>
+<td style="text-align: right;">-76.89764</td>
+<td style="text-align: right;">720965</td>
+<td style="text-align: right;">720377</td>
+<td style="text-align: right;">725118</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RI</td>
+<td style="text-align: right;">41.62873</td>
+<td style="text-align: right;">-71.46200</td>
+<td style="text-align: right;">720306</td>
+<td style="text-align: right;">720175</td>
+<td style="text-align: right;">725070</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">SC</td>
+<td style="text-align: right;">34.21846</td>
+<td style="text-align: right;">-81.02689</td>
+<td style="text-align: right;">720361</td>
+<td style="text-align: right;">720333</td>
+<td style="text-align: right;">723104</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">SD</td>
+<td style="text-align: right;">44.05100</td>
+<td style="text-align: right;">-99.84222</td>
+<td style="text-align: right;">720333</td>
+<td style="text-align: right;">720361</td>
+<td style="text-align: right;">726560</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">TN</td>
+<td style="text-align: right;">36.00000</td>
+<td style="text-align: right;">-86.52000</td>
+<td style="text-align: right;">720369</td>
+<td style="text-align: right;">720334</td>
+<td style="text-align: right;">723273</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">TX</td>
+<td style="text-align: right;">30.74246</td>
+<td style="text-align: right;">-97.68093</td>
+<td style="text-align: right;">722050</td>
+<td style="text-align: right;">722040</td>
+<td style="text-align: right;">722547</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">UT</td>
+<td style="text-align: right;">39.91400</td>
+<td style="text-align: right;">-111.98895</td>
+<td style="text-align: right;">690150</td>
+<td style="text-align: right;">720383</td>
+<td style="text-align: right;">725724</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">VA</td>
+<td style="text-align: right;">37.36136</td>
+<td style="text-align: right;">-77.24400</td>
+<td style="text-align: right;">690150</td>
+<td style="text-align: right;">720498</td>
+<td style="text-align: right;">724010</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">VT</td>
+<td style="text-align: right;">43.86850</td>
+<td style="text-align: right;">-72.78200</td>
+<td style="text-align: right;">690150</td>
+<td style="text-align: right;">690150</td>
+<td style="text-align: right;">725165</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">WI</td>
+<td style="text-align: right;">43.95850</td>
+<td style="text-align: right;">-89.48563</td>
+<td style="text-align: right;">720369</td>
+<td style="text-align: right;">720175</td>
+<td style="text-align: right;">726452</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">WV</td>
+<td style="text-align: right;">39.09036</td>
+<td style="text-align: right;">-80.88457</td>
+<td style="text-align: right;">720333</td>
+<td style="text-align: right;">690150</td>
+<td style="text-align: right;">724273</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">WY</td>
+<td style="text-align: right;">42.85807</td>
+<td style="text-align: right;">-107.57500</td>
+<td style="text-align: right;">720333</td>
+<td style="text-align: right;">720383</td>
+<td style="text-align: right;">726720</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-3-in-the-middle" class="level2">
+<h2 class="anchored" data-anchor-id="question-3-in-the-middle"><strong>Question 3: In the middle?</strong></h2>
+<p>For each state, identify the station that is closest to the mean latitude and longitude for stations in that state. Combining these with the coordinates you identified in the previous question, use&nbsp;<code>leaflet()</code>&nbsp;to visualize all ~100 points in the same figure, applying different colors for those identified in this question.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>summary_byState_overall <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STATE) <span class="sc">%&gt;%</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">median.lat =</span> <span class="fu">median</span>(lat),</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">median.lon =</span> <span class="fu">median</span>(lon),</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean.lat =</span> <span class="fu">mean</span>(lat), </span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean.lon =</span> <span class="fu">mean</span>(lon),</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">station.median =</span> df<span class="sc">$</span>USAFID[<span class="fu">which.min</span>((df<span class="sc">$</span>lon <span class="sc">-</span> median.lon)<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (df<span class="sc">$</span>lat <span class="sc">-</span> median.lat)<span class="sc">^</span><span class="dv">2</span>)],</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">lat.station.median =</span> df<span class="sc">$</span>lat[<span class="fu">which.min</span>((df<span class="sc">$</span>lon <span class="sc">-</span> median.lon)<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (df<span class="sc">$</span>lat <span class="sc">-</span> median.lat)<span class="sc">^</span><span class="dv">2</span>)],</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">lon.station.median =</span> df<span class="sc">$</span>lon[<span class="fu">which.min</span>((df<span class="sc">$</span>lon <span class="sc">-</span> median.lon)<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (df<span class="sc">$</span>lat <span class="sc">-</span> median.lat)<span class="sc">^</span><span class="dv">2</span>)],</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">station.mean =</span> df<span class="sc">$</span>USAFID[<span class="fu">which.min</span>((df<span class="sc">$</span>lon <span class="sc">-</span> mean.lon)<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (df<span class="sc">$</span>lat <span class="sc">-</span> mean.lat)<span class="sc">^</span><span class="dv">2</span>)],</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">lat.station.mean =</span> df<span class="sc">$</span>lat[<span class="fu">which.min</span>((df<span class="sc">$</span>lon <span class="sc">-</span> mean.lon)<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (df<span class="sc">$</span>lat <span class="sc">-</span> mean.lat)<span class="sc">^</span><span class="dv">2</span>)],</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">lon.station.mean =</span> df<span class="sc">$</span>lon[<span class="fu">which.min</span>((df<span class="sc">$</span>lon <span class="sc">-</span> mean.lon)<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (df<span class="sc">$</span>lat <span class="sc">-</span> mean.lat)<span class="sc">^</span><span class="dv">2</span>)]) <span class="sc">%&gt;%</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(STATE, </span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>         median.lat, median.lon,</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>         station.median, lat.station.median, lon.station.median,</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>         mean.lat, mean.lon,</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>         station.mean,lat.station.mean,lon.station.mean) <span class="sc">%&gt;%</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>summary_byState_mean <span class="ot">&lt;-</span> summary_byState_overall <span class="sc">%&gt;%</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(STATE, </span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>         station.mean, lat.station.mean, lon.station.mean) <span class="sc">%&gt;%</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">State =</span> STATE, </span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">Station =</span> station.mean, </span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">Lat =</span> lat.station.mean, </span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">Lon =</span> lon.station.mean) <span class="sc">%&gt;%</span></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="st">"mean"</span>)</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>summary_byState_median <span class="ot">&lt;-</span> summary_byState_overall <span class="sc">%&gt;%</span></span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(STATE, </span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>         station.median, lat.station.median, lon.station.median) <span class="sc">%&gt;%</span></span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">State =</span> STATE, </span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>         <span class="at">Station =</span> station.median, </span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>         <span class="at">Lat =</span> lat.station.median, </span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>         <span class="at">Lon =</span> lon.station.median) <span class="sc">%&gt;%</span></span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="st">"median"</span>)</span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>summary_byState <span class="ot">&lt;-</span> <span class="fu">rbind</span>(summary_byState_mean, summary_byState_median)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(leaflet)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>summary_byState <span class="ot">&lt;-</span> summary_byState <span class="sc">%&gt;%</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="fu">factor</span>(Type, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"mean"</span>,<span class="st">"median"</span>)))</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>pal <span class="ot">&lt;-</span> leaflet<span class="sc">::</span><span class="fu">colorFactor</span>(</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">"#F8766D"</span>, <span class="st">"#00BFC4"</span>),</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">domain  =</span> <span class="fu">levels</span>(summary_byState<span class="sc">$</span>Type)  </span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="fu">leaflet</span>(summary_byState) <span class="sc">%&gt;%</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addMapPane</span>(<span class="st">"left"</span>,  <span class="at">zIndex =</span> <span class="dv">410</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addMapPane</span>(<span class="st">"right"</span>, <span class="at">zIndex =</span> <span class="dv">410</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addProviderTiles</span>(<span class="st">"OpenStreetMap"</span>, <span class="at">options =</span> <span class="fu">pathOptions</span>(<span class="at">pane =</span> <span class="st">"left"</span>),  <span class="at">layerId =</span> <span class="st">"layer_mean"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addProviderTiles</span>(<span class="st">"OpenStreetMap"</span>, <span class="at">options =</span> <span class="fu">pathOptions</span>(<span class="at">pane =</span> <span class="st">"right"</span>), <span class="at">layerId =</span> <span class="st">"layer_median"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addCircles</span>(</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">filter</span>(summary_byState, Type <span class="sc">==</span> <span class="st">"mean"</span>),</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">lat =</span> <span class="sc">~</span>Lat, <span class="at">lng =</span> <span class="sc">~</span>Lon,</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">fillColor =</span> <span class="sc">~</span><span class="fu">pal</span>(Type),</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">fillOpacity =</span> <span class="dv">1</span>,       </span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">weight =</span> <span class="fl">0.5</span>,</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">radius =</span> <span class="dv">100</span>,</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">options =</span> <span class="fu">pathOptions</span>(<span class="at">pane =</span> <span class="st">"left"</span>),</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> <span class="st">"mean"</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addCircles</span>(</span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">filter</span>(summary_byState, Type <span class="sc">==</span> <span class="st">"median"</span>),</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">lat =</span> <span class="sc">~</span>Lat, <span class="at">lng =</span> <span class="sc">~</span>Lon,</span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">fillColor =</span> <span class="sc">~</span><span class="fu">pal</span>(Type),</span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">fillOpacity =</span> <span class="dv">1</span>,        </span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">weight =</span> <span class="fl">0.5</span>,</span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">radius =</span> <span class="dv">100</span>,</span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">options =</span> <span class="fu">pathOptions</span>(<span class="at">pane =</span> <span class="st">"right"</span>),</span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> <span class="st">"median"</span></span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addLegend</span>(</span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a>    <span class="st">"topright"</span>,</span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Location of Sites"</span>,</span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">pal =</span> pal, <span class="at">values =</span> <span class="sc">~</span>Type, <span class="at">opacity =</span> <span class="dv">1</span></span>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-46"><a href="#cb17-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addLayersControl</span>(</span>
+<span id="cb17-47"><a href="#cb17-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">overlayGroups =</span> <span class="fu">c</span>(<span class="st">"mean"</span>,<span class="st">"median"</span>),</span>
+<span id="cb17-48"><a href="#cb17-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">options =</span> <span class="fu">layersControlOptions</span>(<span class="at">collapsed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb17-49"><a href="#cb17-49" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb17-50"><a href="#cb17-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-51"><a href="#cb17-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addSidebyside</span>(</span>
+<span id="cb17-52"><a href="#cb17-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">layerId =</span> <span class="st">"sidecontrols"</span>,</span>
+<span id="cb17-53"><a href="#cb17-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">leftId =</span> <span class="st">"layer_mean"</span>,</span>
+<span id="cb17-54"><a href="#cb17-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">rightId =</span> <span class="st">"layer_median"</span></span>
+<span id="cb17-55"><a href="#cb17-55" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="leaflet html-widget html-fill-item" id="htmlwidget-bbcf96e7c343b3665db3" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-bbcf96e7c343b3665db3">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"createMapPane","args":["left",410]},{"method":"createMapPane","args":["right",410]},{"method":"addProviderTiles","args":["OpenStreetMap","layer_mean",null,{"interactive":true,"className":"","pane":"left"}]},{"method":"addProviderTiles","args":["OpenStreetMap","layer_median",null,{"interactive":true,"className":"","pane":"right"}]},{"method":"addCircles","args":[[32.383,34.91702857142857,33.46683333333333,36.319,39.229,41.51,39.133,27.96311111111111,32.68891666666667,42.111,44.523,40.483,39.825,38.8,37.90007692307692,31.395,42.191,39.17452380952381,44.533,42.77465,44.21716666666666,38.096,32.32,45.80532291666667,35.17398159509202,41.433,43.567,40.01698795180723,35.003,38.051,42.206,40.616,35.534,42.37713541666667,40.296,41.72446341463414,33.94314285714286,44.38105633802817,36.009,30.74091666666667,40.219,37.51011904761905,43.533,44.35902816901409,39.29601388888889,43.06443373493976],[-86.35062337662337,-92.14991428571429,-111.7328611111111,-119.628,-106.316,-72.828,-75.467,-82.53844444444445,-83.65216666666667,-92.916,-114.215,-88.95,-86.29600000000001,-97.65000000000001,-85.96705494505494,-92.291,-71.17400000000001,-76.68080952380953,-69.667,-84.59999999999999,-93.91705555555556,-92.55294444444444,-90.07925,-108.5398229166667,-79.00903067484663,-99.633,-71.43300000000001,-74.59990361445783,-105.662,-117.09,-75.98042857142858,-83.06397222222222,-97.64700000000001,-122.8708020833333,-78.31999999999999,-71.43300000000001,-81.11785714285713,-100.2850281690141,-86.52,-98.23516666666667,-111.723,-77.32435714285714,-72.95,-89.83705633802818,-80.22898611111111,-108.4568915662651],100,null,"mean",{"interactive":true,"className":"","pane":"left","stroke":true,"color":"black","weight":0.5,"opacity":0.5,"fill":true,"fillColor":["#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D","#F8766D"],"fillOpacity":1},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null,null]},{"method":"addCircles","args":[[32.3,34.91702857142857,33.46683333333333,34.74485714285714,39.57,41.51,39.133,28.29,33.63309523809524,42.111,44.523,39.83404225352113,40.528,38.8,38.18491549295775,30.205,42.191,39.17452380952381,44.316,42.77465,44.83186111111111,38.591,32.33466666666666,45.80532291666667,35.17398159509202,41.623,43.20373684210526,40.033,35.003,39.29577380952381,43.234,40.616,35.534,42.37713541666667,40.217,41.72446341463414,33.97094285714285,44.38105633802817,36.009,30.679,40.219,37.51011904761905,43.533,44.35902816901409,39.34,43.06443373493976],[-86.40597894736842,-92.14991428571429,-111.7328611111111,-118.7252857142857,-104.8480277777778,-72.828,-75.467,-81.437,-84.43807142857142,-92.916,-114.215,-88.866,-86.059,-97.65000000000001,-84.90305633802818,-91.988,-71.17400000000001,-76.68080952380953,-69.797,-84.59999999999999,-93.47061111111111,-92.15600000000001,-88.74504761904763,-108.5398229166667,-79.00903067484663,-98.94799999999999,-71.50224210526316,-74.34999999999999,-105.662,-114.8453809523809,-75.41193055555556,-83.06397222222222,-97.64700000000001,-122.8708020833333,-76.851,-71.43300000000001,-80.99581428571427,-100.2850281690141,-86.52,-97.679,-111.723,-77.32435714285714,-72.95,-89.83705633802818,-81.444,-108.4568915662651],100,null,"median",{"interactive":true,"className":"","pane":"right","stroke":true,"color":"black","weight":0.5,"opacity":0.5,"fill":true,"fillColor":["#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4","#00BFC4"],"fillOpacity":1},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null,null]},{"method":"addLegend","args":[{"colors":["#F8766D","#00BFC4"],"labels":["mean","median"],"na_color":null,"na_label":"NA","opacity":1,"position":"topright","type":"factor","title":"Location of Sites","extra":null,"layerId":null,"className":"info legend","group":null}]},{"method":"addLayersControl","args":[[],["mean","median"],{"collapsed":false,"autoZIndex":true,"position":"topright"}]},{"method":"addSidebyside","args":["sidecontrols","layer_mean","layer_median",{"thumbSize":42,"padding":0}]}],"limits":{"lat":[27.96311111111111,45.80532291666667],"lng":[-122.8708020833333,-69.667]}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(summary_byState_overall <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(STATE, median.lat, median.lon, lat.station.median, lon.station.median, station.median,</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>         mean.lat, mean.lon, lat.station.mean, lon.station.mean, station.mean) <span class="sc">%&gt;%</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">State =</span> STATE,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Median Latitude</span><span class="st">`</span> <span class="ot">=</span> median.lat, </span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Median Longitude</span><span class="st">`</span> <span class="ot">=</span> median.lon, </span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Latitude of Station Closest to Median</span><span class="st">`</span> <span class="ot">=</span> lat.station.median, </span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Longitude Station Closest to Median</span><span class="st">`</span> <span class="ot">=</span> lon.station.median,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Station Closest to Median</span><span class="st">`</span> <span class="ot">=</span> station.median, </span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Mean Latitude</span><span class="st">`</span> <span class="ot">=</span> mean.lat, </span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Mean Longitude</span><span class="st">`</span> <span class="ot">=</span> mean.lon, </span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Latitude of Station Closest to Mean</span><span class="st">`</span> <span class="ot">=</span> lat.station.mean, </span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Longitude of Station Closest to Mean Longitude</span><span class="st">`</span> <span class="ot">=</span> lon.station.mean, </span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Station Closest to Mean</span><span class="st">`</span> <span class="ot">=</span> station.mean))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 2%">
+<col style="width: 5%">
+<col style="width: 6%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 9%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 13%">
+<col style="width: 17%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">State</th>
+<th style="text-align: right;">Median Latitude</th>
+<th style="text-align: right;">Median Longitude</th>
+<th style="text-align: right;">Latitude of Station Closest to Median</th>
+<th style="text-align: right;">Longitude Station Closest to Median</th>
+<th style="text-align: right;">Station Closest to Median</th>
+<th style="text-align: right;">Mean Latitude</th>
+<th style="text-align: right;">Mean Longitude</th>
+<th style="text-align: right;">Latitude of Station Closest to Mean</th>
+<th style="text-align: right;">Longitude of Station Closest to Mean Longitude</th>
+<th style="text-align: right;">Station Closest to Mean</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">AL</td>
+<td style="text-align: right;">32.34150</td>
+<td style="text-align: right;">-86.50849</td>
+<td style="text-align: right;">32.30000</td>
+<td style="text-align: right;">-86.40598</td>
+<td style="text-align: right;">722260</td>
+<td style="text-align: right;">32.57813</td>
+<td style="text-align: right;">-86.58992</td>
+<td style="text-align: right;">32.38300</td>
+<td style="text-align: right;">-86.35062</td>
+<td style="text-align: right;">722265</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">AR</td>
+<td style="text-align: right;">35.33300</td>
+<td style="text-align: right;">-92.47001</td>
+<td style="text-align: right;">34.91703</td>
+<td style="text-align: right;">-92.14991</td>
+<td style="text-align: right;">723405</td>
+<td style="text-align: right;">35.26828</td>
+<td style="text-align: right;">-92.47072</td>
+<td style="text-align: right;">34.91703</td>
+<td style="text-align: right;">-92.14991</td>
+<td style="text-align: right;">723405</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">AZ</td>
+<td style="text-align: right;">33.54842</td>
+<td style="text-align: right;">-111.44743</td>
+<td style="text-align: right;">33.46683</td>
+<td style="text-align: right;">-111.73286</td>
+<td style="text-align: right;">722783</td>
+<td style="text-align: right;">33.67025</td>
+<td style="text-align: right;">-111.20677</td>
+<td style="text-align: right;">33.46683</td>
+<td style="text-align: right;">-111.73286</td>
+<td style="text-align: right;">722783</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CA</td>
+<td style="text-align: right;">34.89914</td>
+<td style="text-align: right;">-119.20600</td>
+<td style="text-align: right;">34.74486</td>
+<td style="text-align: right;">-118.72529</td>
+<td style="text-align: right;">723830</td>
+<td style="text-align: right;">35.97331</td>
+<td style="text-align: right;">-119.55801</td>
+<td style="text-align: right;">36.31900</td>
+<td style="text-align: right;">-119.62800</td>
+<td style="text-align: right;">723898</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CO</td>
+<td style="text-align: right;">39.23000</td>
+<td style="text-align: right;">-105.01579</td>
+<td style="text-align: right;">39.57000</td>
+<td style="text-align: right;">-104.84803</td>
+<td style="text-align: right;">724666</td>
+<td style="text-align: right;">39.05824</td>
+<td style="text-align: right;">-105.68937</td>
+<td style="text-align: right;">39.22900</td>
+<td style="text-align: right;">-106.31600</td>
+<td style="text-align: right;">724673</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CT</td>
+<td style="text-align: right;">41.48278</td>
+<td style="text-align: right;">-72.82800</td>
+<td style="text-align: right;">41.51000</td>
+<td style="text-align: right;">-72.82800</td>
+<td style="text-align: right;">725027</td>
+<td style="text-align: right;">41.50337</td>
+<td style="text-align: right;">-72.78073</td>
+<td style="text-align: right;">41.51000</td>
+<td style="text-align: right;">-72.82800</td>
+<td style="text-align: right;">725027</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DE</td>
+<td style="text-align: right;">39.13300</td>
+<td style="text-align: right;">-75.46700</td>
+<td style="text-align: right;">39.13300</td>
+<td style="text-align: right;">-75.46700</td>
+<td style="text-align: right;">724088</td>
+<td style="text-align: right;">39.16567</td>
+<td style="text-align: right;">-75.47867</td>
+<td style="text-align: right;">39.13300</td>
+<td style="text-align: right;">-75.46700</td>
+<td style="text-align: right;">724088</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FL</td>
+<td style="text-align: right;">28.43374</td>
+<td style="text-align: right;">-81.77500</td>
+<td style="text-align: right;">28.29000</td>
+<td style="text-align: right;">-81.43700</td>
+<td style="text-align: right;">722011</td>
+<td style="text-align: right;">28.24295</td>
+<td style="text-align: right;">-82.70414</td>
+<td style="text-align: right;">27.96311</td>
+<td style="text-align: right;">-82.53844</td>
+<td style="text-align: right;">722110</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">GA</td>
+<td style="text-align: right;">33.35508</td>
+<td style="text-align: right;">-83.83000</td>
+<td style="text-align: right;">33.63310</td>
+<td style="text-align: right;">-84.43807</td>
+<td style="text-align: right;">722190</td>
+<td style="text-align: right;">32.91865</td>
+<td style="text-align: right;">-83.56413</td>
+<td style="text-align: right;">32.68892</td>
+<td style="text-align: right;">-83.65217</td>
+<td style="text-align: right;">722170</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">IA</td>
+<td style="text-align: right;">42.05106</td>
+<td style="text-align: right;">-93.12153</td>
+<td style="text-align: right;">42.11100</td>
+<td style="text-align: right;">-92.91600</td>
+<td style="text-align: right;">725461</td>
+<td style="text-align: right;">42.07008</td>
+<td style="text-align: right;">-93.01262</td>
+<td style="text-align: right;">42.11100</td>
+<td style="text-align: right;">-92.91600</td>
+<td style="text-align: right;">725461</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ID</td>
+<td style="text-align: right;">43.56700</td>
+<td style="text-align: right;">-114.21500</td>
+<td style="text-align: right;">44.52300</td>
+<td style="text-align: right;">-114.21500</td>
+<td style="text-align: right;">722142</td>
+<td style="text-align: right;">43.53715</td>
+<td style="text-align: right;">-114.13061</td>
+<td style="text-align: right;">44.52300</td>
+<td style="text-align: right;">-114.21500</td>
+<td style="text-align: right;">722142</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">IL</td>
+<td style="text-align: right;">40.04000</td>
+<td style="text-align: right;">-88.95000</td>
+<td style="text-align: right;">39.83404</td>
+<td style="text-align: right;">-88.86600</td>
+<td style="text-align: right;">725316</td>
+<td style="text-align: right;">40.30293</td>
+<td style="text-align: right;">-89.03874</td>
+<td style="text-align: right;">40.48300</td>
+<td style="text-align: right;">-88.95000</td>
+<td style="text-align: right;">724397</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">IN</td>
+<td style="text-align: right;">40.23400</td>
+<td style="text-align: right;">-86.29600</td>
+<td style="text-align: right;">40.52800</td>
+<td style="text-align: right;">-86.05900</td>
+<td style="text-align: right;">724387</td>
+<td style="text-align: right;">40.10006</td>
+<td style="text-align: right;">-86.37537</td>
+<td style="text-align: right;">39.82500</td>
+<td style="text-align: right;">-86.29600</td>
+<td style="text-align: right;">724384</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">KS</td>
+<td style="text-align: right;">38.57496</td>
+<td style="text-align: right;">-97.27100</td>
+<td style="text-align: right;">38.80000</td>
+<td style="text-align: right;">-97.65000</td>
+<td style="text-align: right;">724586</td>
+<td style="text-align: right;">38.39266</td>
+<td style="text-align: right;">-97.55138</td>
+<td style="text-align: right;">38.80000</td>
+<td style="text-align: right;">-97.65000</td>
+<td style="text-align: right;">724586</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">KY</td>
+<td style="text-align: right;">37.85018</td>
+<td style="text-align: right;">-85.28353</td>
+<td style="text-align: right;">38.18492</td>
+<td style="text-align: right;">-84.90306</td>
+<td style="text-align: right;">724233</td>
+<td style="text-align: right;">37.81000</td>
+<td style="text-align: right;">-85.61818</td>
+<td style="text-align: right;">37.90008</td>
+<td style="text-align: right;">-85.96705</td>
+<td style="text-align: right;">724240</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LA</td>
+<td style="text-align: right;">30.78003</td>
+<td style="text-align: right;">-92.01442</td>
+<td style="text-align: right;">30.20500</td>
+<td style="text-align: right;">-91.98800</td>
+<td style="text-align: right;">722405</td>
+<td style="text-align: right;">31.00289</td>
+<td style="text-align: right;">-91.98310</td>
+<td style="text-align: right;">31.39500</td>
+<td style="text-align: right;">-92.29100</td>
+<td style="text-align: right;">722487</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MA</td>
+<td style="text-align: right;">42.13150</td>
+<td style="text-align: right;">-70.98270</td>
+<td style="text-align: right;">42.19100</td>
+<td style="text-align: right;">-71.17400</td>
+<td style="text-align: right;">725098</td>
+<td style="text-align: right;">42.07713</td>
+<td style="text-align: right;">-71.09018</td>
+<td style="text-align: right;">42.19100</td>
+<td style="text-align: right;">-71.17400</td>
+<td style="text-align: right;">725098</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MD</td>
+<td style="text-align: right;">39.16706</td>
+<td style="text-align: right;">-76.42900</td>
+<td style="text-align: right;">39.17452</td>
+<td style="text-align: right;">-76.68081</td>
+<td style="text-align: right;">724060</td>
+<td style="text-align: right;">38.90031</td>
+<td style="text-align: right;">-76.58666</td>
+<td style="text-align: right;">39.17452</td>
+<td style="text-align: right;">-76.68081</td>
+<td style="text-align: right;">724060</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ME</td>
+<td style="text-align: right;">44.31600</td>
+<td style="text-align: right;">-69.66700</td>
+<td style="text-align: right;">44.31600</td>
+<td style="text-align: right;">-69.79700</td>
+<td style="text-align: right;">726185</td>
+<td style="text-align: right;">44.56161</td>
+<td style="text-align: right;">-69.54570</td>
+<td style="text-align: right;">44.53300</td>
+<td style="text-align: right;">-69.66700</td>
+<td style="text-align: right;">726073</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MI</td>
+<td style="text-align: right;">42.77465</td>
+<td style="text-align: right;">-84.67521</td>
+<td style="text-align: right;">42.77465</td>
+<td style="text-align: right;">-84.60000</td>
+<td style="text-align: right;">725390</td>
+<td style="text-align: right;">43.28900</td>
+<td style="text-align: right;">-84.80573</td>
+<td style="text-align: right;">42.77465</td>
+<td style="text-align: right;">-84.60000</td>
+<td style="text-align: right;">725390</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MN</td>
+<td style="text-align: right;">44.83186</td>
+<td style="text-align: right;">-94.05100</td>
+<td style="text-align: right;">44.83186</td>
+<td style="text-align: right;">-93.47061</td>
+<td style="text-align: right;">726579</td>
+<td style="text-align: right;">44.76464</td>
+<td style="text-align: right;">-94.15277</td>
+<td style="text-align: right;">44.21717</td>
+<td style="text-align: right;">-93.91706</td>
+<td style="text-align: right;">726585</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MO</td>
+<td style="text-align: right;">38.62400</td>
+<td style="text-align: right;">-92.38041</td>
+<td style="text-align: right;">38.59100</td>
+<td style="text-align: right;">-92.15600</td>
+<td style="text-align: right;">724458</td>
+<td style="text-align: right;">38.32449</td>
+<td style="text-align: right;">-92.49432</td>
+<td style="text-align: right;">38.09600</td>
+<td style="text-align: right;">-92.55294</td>
+<td style="text-align: right;">724459</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MS</td>
+<td style="text-align: right;">32.33583</td>
+<td style="text-align: right;">-89.05173</td>
+<td style="text-align: right;">32.33467</td>
+<td style="text-align: right;">-88.74505</td>
+<td style="text-align: right;">722340</td>
+<td style="text-align: right;">32.51710</td>
+<td style="text-align: right;">-89.45040</td>
+<td style="text-align: right;">32.32000</td>
+<td style="text-align: right;">-90.07925</td>
+<td style="text-align: right;">722350</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MT</td>
+<td style="text-align: right;">46.08138</td>
+<td style="text-align: right;">-108.99841</td>
+<td style="text-align: right;">45.80532</td>
+<td style="text-align: right;">-108.53982</td>
+<td style="text-align: right;">726770</td>
+<td style="text-align: right;">46.30505</td>
+<td style="text-align: right;">-108.10784</td>
+<td style="text-align: right;">45.80532</td>
+<td style="text-align: right;">-108.53982</td>
+<td style="text-align: right;">726770</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NC</td>
+<td style="text-align: right;">35.19700</td>
+<td style="text-align: right;">-78.88000</td>
+<td style="text-align: right;">35.17398</td>
+<td style="text-align: right;">-79.00903</td>
+<td style="text-align: right;">723030</td>
+<td style="text-align: right;">35.27546</td>
+<td style="text-align: right;">-78.77812</td>
+<td style="text-align: right;">35.17398</td>
+<td style="text-align: right;">-79.00903</td>
+<td style="text-align: right;">723030</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NE</td>
+<td style="text-align: right;">41.21428</td>
+<td style="text-align: right;">-98.97400</td>
+<td style="text-align: right;">41.62300</td>
+<td style="text-align: right;">-98.94800</td>
+<td style="text-align: right;">725524</td>
+<td style="text-align: right;">41.32340</td>
+<td style="text-align: right;">-99.26799</td>
+<td style="text-align: right;">41.43300</td>
+<td style="text-align: right;">-99.63300</td>
+<td style="text-align: right;">725555</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NH</td>
+<td style="text-align: right;">43.27800</td>
+<td style="text-align: right;">-71.50224</td>
+<td style="text-align: right;">43.20374</td>
+<td style="text-align: right;">-71.50224</td>
+<td style="text-align: right;">726050</td>
+<td style="text-align: right;">43.48962</td>
+<td style="text-align: right;">-71.55270</td>
+<td style="text-align: right;">43.56700</td>
+<td style="text-align: right;">-71.43300</td>
+<td style="text-align: right;">726155</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NJ</td>
+<td style="text-align: right;">40.10800</td>
+<td style="text-align: right;">-74.45850</td>
+<td style="text-align: right;">40.03300</td>
+<td style="text-align: right;">-74.35000</td>
+<td style="text-align: right;">724090</td>
+<td style="text-align: right;">40.18602</td>
+<td style="text-align: right;">-74.48821</td>
+<td style="text-align: right;">40.01699</td>
+<td style="text-align: right;">-74.59990</td>
+<td style="text-align: right;">724096</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NM</td>
+<td style="text-align: right;">35.03975</td>
+<td style="text-align: right;">-105.14103</td>
+<td style="text-align: right;">35.00300</td>
+<td style="text-align: right;">-105.66200</td>
+<td style="text-align: right;">722677</td>
+<td style="text-align: right;">34.79327</td>
+<td style="text-align: right;">-105.46291</td>
+<td style="text-align: right;">35.00300</td>
+<td style="text-align: right;">-105.66200</td>
+<td style="text-align: right;">722677</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NV</td>
+<td style="text-align: right;">39.29577</td>
+<td style="text-align: right;">-116.02564</td>
+<td style="text-align: right;">39.29577</td>
+<td style="text-align: right;">-114.84538</td>
+<td style="text-align: right;">724860</td>
+<td style="text-align: right;">38.44826</td>
+<td style="text-align: right;">-116.73663</td>
+<td style="text-align: right;">38.05100</td>
+<td style="text-align: right;">-117.09000</td>
+<td style="text-align: right;">724855</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NY</td>
+<td style="text-align: right;">42.64300</td>
+<td style="text-align: right;">-75.41193</td>
+<td style="text-align: right;">43.23400</td>
+<td style="text-align: right;">-75.41193</td>
+<td style="text-align: right;">725196</td>
+<td style="text-align: right;">42.61390</td>
+<td style="text-align: right;">-75.54656</td>
+<td style="text-align: right;">42.20600</td>
+<td style="text-align: right;">-75.98043</td>
+<td style="text-align: right;">725150</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OH</td>
+<td style="text-align: right;">40.70800</td>
+<td style="text-align: right;">-82.87821</td>
+<td style="text-align: right;">40.61600</td>
+<td style="text-align: right;">-83.06397</td>
+<td style="text-align: right;">725208</td>
+<td style="text-align: right;">40.56577</td>
+<td style="text-align: right;">-82.82380</td>
+<td style="text-align: right;">40.61600</td>
+<td style="text-align: right;">-83.06397</td>
+<td style="text-align: right;">725208</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">OK</td>
+<td style="text-align: right;">35.53400</td>
+<td style="text-align: right;">-97.60075</td>
+<td style="text-align: right;">35.53400</td>
+<td style="text-align: right;">-97.64700</td>
+<td style="text-align: right;">723544</td>
+<td style="text-align: right;">35.58933</td>
+<td style="text-align: right;">-97.68538</td>
+<td style="text-align: right;">35.53400</td>
+<td style="text-align: right;">-97.64700</td>
+<td style="text-align: right;">723544</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OR</td>
+<td style="text-align: right;">42.15667</td>
+<td style="text-align: right;">-123.11740</td>
+<td style="text-align: right;">42.37714</td>
+<td style="text-align: right;">-122.87080</td>
+<td style="text-align: right;">725970</td>
+<td style="text-align: right;">42.23908</td>
+<td style="text-align: right;">-122.82312</td>
+<td style="text-align: right;">42.37714</td>
+<td style="text-align: right;">-122.87080</td>
+<td style="text-align: right;">725970</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PA</td>
+<td style="text-align: right;">40.46300</td>
+<td style="text-align: right;">-76.89764</td>
+<td style="text-align: right;">40.21700</td>
+<td style="text-align: right;">-76.85100</td>
+<td style="text-align: right;">725118</td>
+<td style="text-align: right;">40.69587</td>
+<td style="text-align: right;">-77.66842</td>
+<td style="text-align: right;">40.29600</td>
+<td style="text-align: right;">-78.32000</td>
+<td style="text-align: right;">725126</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RI</td>
+<td style="text-align: right;">41.62873</td>
+<td style="text-align: right;">-71.46200</td>
+<td style="text-align: right;">41.72446</td>
+<td style="text-align: right;">-71.43300</td>
+<td style="text-align: right;">725070</td>
+<td style="text-align: right;">41.63212</td>
+<td style="text-align: right;">-71.50150</td>
+<td style="text-align: right;">41.72446</td>
+<td style="text-align: right;">-71.43300</td>
+<td style="text-align: right;">725070</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">SC</td>
+<td style="text-align: right;">34.21846</td>
+<td style="text-align: right;">-81.02689</td>
+<td style="text-align: right;">33.97094</td>
+<td style="text-align: right;">-80.99581</td>
+<td style="text-align: right;">723104</td>
+<td style="text-align: right;">34.10843</td>
+<td style="text-align: right;">-81.25197</td>
+<td style="text-align: right;">33.94314</td>
+<td style="text-align: right;">-81.11786</td>
+<td style="text-align: right;">723100</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">SD</td>
+<td style="text-align: right;">44.05100</td>
+<td style="text-align: right;">-99.84222</td>
+<td style="text-align: right;">44.38106</td>
+<td style="text-align: right;">-100.28503</td>
+<td style="text-align: right;">726560</td>
+<td style="text-align: right;">44.10629</td>
+<td style="text-align: right;">-99.81051</td>
+<td style="text-align: right;">44.38106</td>
+<td style="text-align: right;">-100.28503</td>
+<td style="text-align: right;">726560</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">TN</td>
+<td style="text-align: right;">36.00000</td>
+<td style="text-align: right;">-86.52000</td>
+<td style="text-align: right;">36.00900</td>
+<td style="text-align: right;">-86.52000</td>
+<td style="text-align: right;">723273</td>
+<td style="text-align: right;">35.88487</td>
+<td style="text-align: right;">-86.34616</td>
+<td style="text-align: right;">36.00900</td>
+<td style="text-align: right;">-86.52000</td>
+<td style="text-align: right;">723273</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">TX</td>
+<td style="text-align: right;">30.74246</td>
+<td style="text-align: right;">-97.68093</td>
+<td style="text-align: right;">30.67900</td>
+<td style="text-align: right;">-97.67900</td>
+<td style="text-align: right;">722547</td>
+<td style="text-align: right;">30.73183</td>
+<td style="text-align: right;">-98.11856</td>
+<td style="text-align: right;">30.74092</td>
+<td style="text-align: right;">-98.23517</td>
+<td style="text-align: right;">722542</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">UT</td>
+<td style="text-align: right;">39.91400</td>
+<td style="text-align: right;">-111.98895</td>
+<td style="text-align: right;">40.21900</td>
+<td style="text-align: right;">-111.72300</td>
+<td style="text-align: right;">725724</td>
+<td style="text-align: right;">39.56987</td>
+<td style="text-align: right;">-112.03208</td>
+<td style="text-align: right;">40.21900</td>
+<td style="text-align: right;">-111.72300</td>
+<td style="text-align: right;">725724</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">VA</td>
+<td style="text-align: right;">37.36136</td>
+<td style="text-align: right;">-77.24400</td>
+<td style="text-align: right;">37.51012</td>
+<td style="text-align: right;">-77.32436</td>
+<td style="text-align: right;">724010</td>
+<td style="text-align: right;">37.61619</td>
+<td style="text-align: right;">-77.31317</td>
+<td style="text-align: right;">37.51012</td>
+<td style="text-align: right;">-77.32436</td>
+<td style="text-align: right;">724010</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">VT</td>
+<td style="text-align: right;">43.86850</td>
+<td style="text-align: right;">-72.78200</td>
+<td style="text-align: right;">43.53300</td>
+<td style="text-align: right;">-72.95000</td>
+<td style="text-align: right;">725165</td>
+<td style="text-align: right;">43.82947</td>
+<td style="text-align: right;">-72.84049</td>
+<td style="text-align: right;">43.53300</td>
+<td style="text-align: right;">-72.95000</td>
+<td style="text-align: right;">725165</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">WI</td>
+<td style="text-align: right;">43.95850</td>
+<td style="text-align: right;">-89.48563</td>
+<td style="text-align: right;">44.35903</td>
+<td style="text-align: right;">-89.83706</td>
+<td style="text-align: right;">726452</td>
+<td style="text-align: right;">44.09937</td>
+<td style="text-align: right;">-89.34980</td>
+<td style="text-align: right;">44.35903</td>
+<td style="text-align: right;">-89.83706</td>
+<td style="text-align: right;">726452</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">WV</td>
+<td style="text-align: right;">39.09036</td>
+<td style="text-align: right;">-80.88457</td>
+<td style="text-align: right;">39.34000</td>
+<td style="text-align: right;">-81.44400</td>
+<td style="text-align: right;">724273</td>
+<td style="text-align: right;">38.85670</td>
+<td style="text-align: right;">-80.65082</td>
+<td style="text-align: right;">39.29601</td>
+<td style="text-align: right;">-80.22899</td>
+<td style="text-align: right;">724175</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">WY</td>
+<td style="text-align: right;">42.85807</td>
+<td style="text-align: right;">-107.57500</td>
+<td style="text-align: right;">43.06443</td>
+<td style="text-align: right;">-108.45689</td>
+<td style="text-align: right;">726720</td>
+<td style="text-align: right;">42.96957</td>
+<td style="text-align: right;">-107.56007</td>
+<td style="text-align: right;">43.06443</td>
+<td style="text-align: right;">-108.45689</td>
+<td style="text-align: right;">726720</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-4-means-of-means" class="level2">
+<h2 class="anchored" data-anchor-id="question-4-means-of-means"><strong>Question 4: Means of means</strong></h2>
+<p>Compute each state’s average temperature and use that to classify them according to the following criteria:</p>
+<ul>
+<li><p>low: temp &lt; 20</p></li>
+<li><p>Mid: temp &gt;= 20 and temp &lt; 25</p></li>
+<li><p>High: temp &gt;= 25</p></li>
+</ul>
+<p>Now generate a large summary table with states/observations split into the three categories listed above. For each group, compute the following:</p>
+<ul>
+<li><p>Number of states</p></li>
+<li><p>Number of entries (records)</p></li>
+<li><p>Number of NA entries</p></li>
+<li><p>Number of stations</p></li>
+<li><p>Mean temperature</p></li>
+<li><p>Mean wind-speed</p></li>
+<li><p>Mean atmospheric pressure</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>summary_byTemp <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STATE) <span class="sc">%&gt;%</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mean.temp =</span> <span class="fu">mean</span>(temp, <span class="at">na.rm =</span> T)) <span class="sc">%&gt;%</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">temp.cat =</span> <span class="fu">case_when</span>(</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>      mean.temp <span class="sc">&lt;</span> <span class="dv">20</span> <span class="sc">~</span> <span class="st">"low"</span>,</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>      mean.temp <span class="sc">&gt;=</span> <span class="dv">20</span>  <span class="sc">&amp;</span> mean.temp <span class="sc">&lt;</span> <span class="dv">25</span> <span class="sc">~</span> <span class="st">"mid"</span>,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>      mean.temp <span class="sc">&gt;=</span> <span class="dv">25</span> <span class="sc">~</span> <span class="st">"high"</span>,</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    ) ) <span class="sc">%&gt;%</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>summary_final <span class="ot">&lt;-</span> summary_byTemp <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">temp.cat =</span> <span class="fu">factor</span>(temp.cat, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"low"</span>,<span class="st">"mid"</span>, <span class="st">"high"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(temp.cat) <span class="sc">%&gt;%</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">num_state =</span> <span class="fu">length</span>(<span class="fu">unique</span>(STATE)), </span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">num_entries =</span> <span class="fu">length</span>(temp), </span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">num_NA_entries =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(temp)), </span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">num_station =</span> <span class="fu">length</span>(<span class="fu">unique</span>(USAFID)), </span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_temp =</span> <span class="fu">mean</span>(temp, <span class="at">na.rm =</span> T), </span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_wind_sp =</span> <span class="fu">mean</span>(wind.sp, <span class="at">na.rm =</span> T), </span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_atm_pressure =</span> <span class="fu">mean</span>(atm.press, <span class="at">na.rm =</span> T)) <span class="sc">%&gt;%</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">Temperature Categories</span><span class="st">`</span> <span class="ot">=</span> temp.cat, </span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Number of States</span><span class="st">`</span> <span class="ot">=</span> num_state, </span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Number of Entries</span><span class="st">`</span> <span class="ot">=</span> num_entries, </span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Number of NA Entries</span><span class="st">`</span> <span class="ot">=</span> num_NA_entries, </span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Number of Stations</span><span class="st">`</span> <span class="ot">=</span> num_station, </span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Mean Tempurature</span><span class="st">`</span> <span class="ot">=</span> mean_temp, </span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Mean Wind Speed</span><span class="st">`</span> <span class="ot">=</span> mean_wind_sp, </span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Mean Atmospheric Pressure</span><span class="st">`</span> <span class="ot">=</span> mean_atm_pressure) <span class="sc">%&gt;%</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(summary_final)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 10%">
+<col style="width: 11%">
+<col style="width: 13%">
+<col style="width: 12%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Temperature Categories</th>
+<th style="text-align: right;">Number of States</th>
+<th style="text-align: right;">Number of Entries</th>
+<th style="text-align: right;">Number of NA Entries</th>
+<th style="text-align: right;">Number of Stations</th>
+<th style="text-align: right;">Mean Tempurature</th>
+<th style="text-align: right;">Mean Wind Speed</th>
+<th style="text-align: right;">Mean Atmospheric Pressure</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">low</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">19.86904</td>
+<td style="text-align: right;">1.694943</td>
+<td style="text-align: right;">1017.905</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">mid</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: right;">504</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">504</td>
+<td style="text-align: right;">22.82383</td>
+<td style="text-align: right;">2.309544</td>
+<td style="text-align: right;">1017.503</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">high</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">360</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">360</td>
+<td style="text-align: right;">27.06251</td>
+<td style="text-align: right;">2.523794</td>
+<td style="text-align: right;">1015.265</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
