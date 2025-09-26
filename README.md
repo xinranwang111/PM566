@@ -13,8 +13,8 @@
   - [Script](https://github.com/xinranwang111/PM566/blob/main/Lab4.qmd)
   - [Output](https://github.com/xinranwang111/PM566/blob/main/Lab4.html)
 - Lab 5
-  - Script
-  - Output
+  - [Script](https://github.com/xinranwang111/PM566/blob/main/Lab5.qmd)
+  - [Output](https://github.com/xinranwang111/PM566/blob/main/Lab5.html)
 - Lab 6
   - Script
   - Output
