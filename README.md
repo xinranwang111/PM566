@@ -39,8 +39,8 @@
   - [Script](https://github.com/xinranwang111/PM566/blob/main/Assignment1.qmd)
   - [Output](https://github.com/xinranwang111/PM566/blob/main/Assignment1.html)
 - Assignment 2
-  - Script
-  - Output
+  - [Script](https://github.com/xinranwang111/PM566/blob/main/Assignment2.qmd)
+  - [Output](https://github.com/xinranwang111/PM566/blob/main/Assignment2.html)
 - Assignment 3
   - Script
   - Output
