@@ -1,0 +1,566 @@
+---
+title: "Assignment2"
+author: "Xinran Wang"
+editor: visual
+format: 
+  html:
+    embed-resources: true
+fig-width: 8
+fig-height: 6
+theme: cosmos
+---
+
+## **Assignment 2 - Data Wrangling, EDA, and Visualization**
+
+## **Due Date**
+
+This assignment is due by 11:59pm Pacific Time on Friday, October 10th, 2025.
+
+## Settings
+
+```{r}
+suppressPackageStartupMessages(library(knitr))
+
+suppressPackageStartupMessages(library(data.table))
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(datasauRus))
+
+suppressPackageStartupMessages(library(skimr))
+
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(ggthemes))
+suppressPackageStartupMessages(library(ggpubr))
+suppressPackageStartupMessages(library(ggmap))
+suppressPackageStartupMessages(library(RColorBrewer))
+suppressPackageStartupMessages(library(leaflet))
+
+suppressPackageStartupMessages(library(cowplot))
+suppressPackageStartupMessages(library(scales))
+
+suppressPackageStartupMessages(library(lubridate))
+```
+
+```{r}
+idir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
+```
+
+# **Learning Goals**
+
+-   Practice getting familiar with an external dataset
+
+-   Reinforce good EDA practices
+
+-   Combine related datasets to answer questions
+
+-   Select appropriate data visualizations
+
+# **Dataset Description**
+
+For this assignment, we will be analyzing data from the `nycflights13` package, which provides information on all flights that left one of New York City’s three main airports in 2013. You can access this data by installing and loading the package, which provides five data frames: `airlines`, `airports`, `flights`, `planes`, and `weather`. These will not automatically populate in your Environment tab in RStudio, but if you want to see them there, you can assign each dataset to a variable of the same name (eg. `airlines <- airlines`).
+
+The main data frame is `flights`, which contains information about every flight out of NYC. The 4 other data frames contain additional information, much of which would be highly redundant to include in the `flights`dataset (for example, information about JFK airport, or the full name of each airline rather than just the abbreviation).
+
+The relationships between the data frames are summarized in the figure below:\
+![](https://r4ds.hadley.nz/diagrams/relational.png)
+
+```{r}
+# install.packages("nycflights13")
+library(nycflights13)
+```
+
+```{r}
+airlines <- airlines
+airports <- airports
+flights <- flights
+planes <- planes
+weather <- weather
+```
+
+# **Questions**
+
+1.  (7 points) Find the top 10 most popular destinations in the `flights` data. How many flights went to each?
+
+    ```{r}
+    kable(left_join(flights, airports, by=c("dest" = "faa")) %>%
+                      mutate(Destination = paste0(name, " (", dest, ")")) %>% 
+            group_by(Destination) %>% 
+            summarize(`Number of Flights` = n()) %>% 
+            arrange(desc(`Number of Flights`)) %>% 
+            slice_head(n = 10) %>% 
+            ungroup(), 
+          align = "c", 
+          caption = "Top 10 Most Popular Destinations")
+    ```
+
+2.  (10 points) Create two new categorical variables in `flights` based on the departure time (`dep_time`), and arrival time (`arr_time`). These new variables should have four categories: “early morning” for 12am to 6am, “morning” for 6am to 12pm, “afternoon” for 12pm to 6pm, and “evening” for 6pm to 12am. Show barplots of both of these new variables. What percentage of flights were “red eye” flights? We’ll define these as flights that depart in “afternoon” or “evening” and arrive in “early morning” or “morning.”
+
+    ```{r}
+    flights <- flights %>% 
+      drop_na(dep_time, arr_time) %>%
+      mutate(
+        `Departure Time Category` = case_when(
+          dep_time >= 0      & dep_time < 6*100  ~ "Early Morning",
+          dep_time >= 6*100  & dep_time < 12*100 ~ "Morning",
+          dep_time >= 12*100 & dep_time < 18*100 ~ "Afternoon",
+          dep_time >= 18*100 & dep_time <= 2400  ~ "Evening", 
+          TRUE ~ NA_character_),
+        `Arrival Time Category` = case_when(
+          arr_time >= 0      & arr_time < 6*100  ~ "Early Morning",
+          arr_time >= 6*100  & arr_time < 12*100 ~ "Morning",
+          arr_time >= 12*100 & arr_time < 18*100 ~ "Afternoon",
+          arr_time >= 18*100 & arr_time <= 2400  ~ "Evening", 
+          TRUE ~ NA_character_),
+        `Flight Type` = ifelse(
+          `Departure Time Category` %in% c("Afternoon", "Evening") &
+          `Arrival Time Category` %in% c("Early Morning", "Morning"),
+          "Red Eye Flight", 
+          "Normal Flight")) 
+    ```
+
+    ```{r}
+    p_barplot_dep <- 
+      ggplot(flights) +
+      aes(x = `Departure Time Category`) +
+      geom_bar(fill = "#66C2A5") +
+      labs(
+       x = "Departure Time",
+       y = "Count") +
+      coord_cartesian(ylim = c(0, 125000)) +
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+      scale_y_continuous(labels = comma) 
+
+    p_barplot_arr <- 
+      ggplot(flights) +
+      aes(x = `Arrival Time Category`) +
+      geom_bar(fill = "#FC8D62") +
+      labs(
+       x = "Arrival Time",
+       y = "Count") +
+      coord_cartesian(ylim = c(0, 125000)) +
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+      scale_y_continuous(labels = comma) 
+
+    p_barplot_redeye <- 
+      ggplot(flights) +
+      aes(x = `Flight Type`) +
+      geom_bar(fill = "#8DA0CB") +
+      labs(
+       x = "Flight Type",
+       y = "Count") +
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+      scale_y_continuous(labels = comma) 
+
+    p_barplot <- cowplot::plot_grid(
+      p_barplot_dep,
+      p_barplot_arr,
+      p_barplot_redeye, 
+      labels = c("A", "B", "C"),
+      label_size = 14,
+      ncol = 3,    
+      align = 'h',  
+      rel_widths = c(1, 1, 0.5)
+    )
+
+    ggdraw() +
+      draw_label("Barplot of Departure, Arrival, and Flight Type",
+                 x = 0.5, y = 1, 
+                 hjust = 0.5, vjust = 1,
+                 size = 12, 
+                 fontface = "bold") +
+      draw_plot(p_barplot, y = 0, height = 0.95) 
+      
+    kable(flights %>%
+            group_by(`Flight Type`) %>%
+            summarize(Percentage = paste0(round(n() / nrow(flights) * 100, 2), " %")) %>%
+            ungroup(), 
+          align = "c", 
+          caption = "Percentage of Red Eye Flights")
+      
+    ```
+
+    [3.24% of the flights are red-eye]{style="color:blue"}.
+
+    ```{r}
+    rm(p_barplot_arr, p_barplot_dep, p_barplot_redeye, p_barplot)
+    ```
+
+3.  (7 points) Were there any planes that flew for multiple airlines? If so, how many were there and which airlines did they fly for?
+
+    ```{r}
+    kable(flights %>%
+      inner_join(airlines, by = "carrier") %>%
+      group_by(tailnum) %>%
+      summarize(
+        `Number of Airlines` = n_distinct(name),
+        `Name of Airlines` = paste(sort(unique(name)), collapse = ", "))  %>%
+      filter(`Number of Airlines` > 1) %>%
+      arrange(desc(`Number of Airlines`)) %>%
+      rename(Plane = tailnum) %>%
+      ungroup(), 
+      align = "c", 
+      caption = "Planes that Flow for Multiple Airlines")
+    ```
+
+    [Eight planes work for both (1) Endeavor Air Inc. and (2) ExpressJet Airlines Inc. Nine planes work for both (1) AirTran Airways Corporation and (2) Delta Air Lines Inc.]{style="color:blue"}
+
+4.  (7 points) In the figure above, there is a missing relationship between `weather` and `airports`. What is the relationship and how should it appear in the diagram?
+
+    [There should be a relationship between `faa` column (from `airports`) and `origin` column (from weather). Note that there are 3 distinct origins from `weather` (EWR, JFK, LGA), and they all appear in `airport`]{style="color:blue"}.
+
+    ```{r}
+    paste0("Number of different faa in airport: ", length(sort(unique(airports$faa))))
+    paste0("Number of different origin in weather: ", length(sort(unique(weather$origin))))
+    paste0("Name of different origin in weather: ", paste(sort(unique(weather$origin)), collapse = ", "))
+    ```
+
+    ```{r}
+    paste0("Is EWR (from weather) in airport? ", "EWR" %in% airports$faa)
+    paste0("Is JFK (from weather) in airport? ", "EWR" %in% airports$faa)
+    paste0("Is LGA (from weather) in airport? ", "EWR" %in% airports$faa)
+    ```
+
+For the rest of this assignment, the primary question you should keep in mind is this:
+
+> Which weather phenomena have the most impact on flight delays?
+
+Don’t try to answer it now, but use this question to guide your exploratory data analysis.
+
+-   (7 points) In order to address our primary question, we want to prepare a tidy dataset (a single data frame). This will consist of information from the `flights` and `weather` data.
+
+    The `year`, `month`, `day`, `hour`, and `origin` variables from `weather` provide *almost* enough information to give each observation a unique value. Create a new variable in the weather dataset by pasting together those 5 variables, then determine how many duplicated values there are and explain why.
+
+    ```{r}
+    n_weather      <- nrow(weather)
+    n_weather_uniq <- nrow(distinct(weather, year, month, day, hour, origin))
+    n_weather_dup  <- n_weather - n_weather_uniq
+
+    print(paste0("# Rows in weather: ", n_weather))
+    print(paste0("# Unique Rows in weather: ", n_weather_uniq))
+    print(paste0("# Duplicated Rows in weather: ",n_weather_dup))
+    ```
+
+    [There are 3 duplicated rows, namely:]{style="color:blue"}
+
+    ```{r}
+    kable(weather %>%
+            group_by(year, month, day, hour, origin) %>%
+            filter(n() > 1) %>%    
+            arrange(year, month, day, hour, origin) %>%
+            ungroup(), 
+      align = "c",
+      caption="Lines with sample year, month, day, hour, origin combination in weather")
+    ```
+
+    [The occurrence of duplicated rows is due to duplicated measurements within the 1 hour period (as we are pasting `origin`, `year`, `month`, `day`, `hour`).]{style="color:blue"}
+
+    [I first tried to distinguish the duplicated rows by adding `minute` and `second` (from `time_hour` variable), however, values from that column are rounded down to the nearest hour (i.e., `2013-01-01 01:00:00 EST`). Alternatively, we can add `_1`, `_2` suffix to duplicated rows to distinguish the difference between 3 duplicated entries:]{style="color:blue"}
+
+    ```{r}
+    weather %>%
+      group_by(year, month, day, hour, origin) %>%
+      mutate(
+        dup_count  = n(), 
+        dup_id     = dplyr::row_number(), 
+        base_id    = paste(year, month, day, hour, origin, sep = "_"),
+        identifier = if_else(dup_count > 1,
+                               paste0(base_id, "_", dup_id),
+                               base_id)) %>%
+      ungroup() %>%
+      select(-dup_count, -dup_id, -base_id) %>%
+      filter(grepl("2013_11_3_1_EWR|2013_11_3_1_JFK|2013_11_3_1_LGA", identifier)) %>%
+      pull(identifier)
+    ```
+
+    [For the simplicity of the analysis, I created the new variable by adding up `year_month_day_hour_origin` and dropping 3 duplicates:]{style="color:blue"}
+
+    ```{r}
+    weather <- weather %>%
+      group_by(year, month, day, hour, origin) %>%
+      mutate(identifier = paste(year, month, day, hour, origin, sep = "_")) %>%
+      ungroup() %>%
+      distinct(identifier, .keep_all = TRUE) 
+
+    nrow(weather)
+    ```
+
+    Now merge the `flights` data and the `weather` data so that each flight contains information about the weather at its **departure airport** at the time it was **scheduled** to take off. You’ll want to use the variables `time_hour` and `origin` in order to do this.
+
+    ```{r}
+    flights_tmp <- flights %>%
+      mutate(
+        identifier = paste(
+          year(time_hour),
+          month(time_hour),
+          day(time_hour),
+          hour(time_hour),
+          origin, 
+          sep = "_"
+        )) %>%
+      select(-c("year", "month", "day", "hour", "time_hour", "origin"))
+
+    df <- left_join(flights_tmp, weather, by = "identifier")
+
+    rm(flights_tmp)
+    ```
+
+-   (20 points) On this merged dataset, perform steps 2-5 of the EDA checklist presented in class. Remember the context provided by our primary question above.
+
+    -   Check the size of the data & Examine the variables and their types (step2-3)
+
+        [(Please scroll to right to see a histogram for each variable)]{style="color:blue"}
+
+    ```{r}
+        skim(df)
+    ```
+
+    -   [Out of 328k entries,]{style="color:blue"}
+
+        -   [\~1.5kentriesmissing in (1) Temperature (2) Dew Point (3) Humidity (4) Wind Speed and (5) Precipitation;]{style="color:blue"}
+
+        -   [\~9.5k entries missinginWind Direction;]{style="color:blue"}
+
+        -   [\~36k entries missing in Pressure;]{style="color:blue"}
+
+        -   [\~250k entries missing in Wind Gust]{style="color:blue"}
+
+    <!-- -->
+
+    -   Look at the top and bottom of the data (step 4)
+
+    ```{r}
+        kable(head(df, 1), caption = "Head of df")
+        kable(tail(df, 1), caption = "Tail of df")
+    ```
+
+    -   Visualize the distributions of key variables (step 5)
+
+    ```{r}
+        weather_phenomenas <- c("temp",     "dewp",       "humid", 
+                                "wind_dir", "wind_speed", "wind_gust", 
+                                "precip",   "pressure",   "visib")
+        weather_phenomenas_colors <- brewer.pal(9, "Set1")
+    ```
+
+    ```{r}
+        plot_list <- map2(weather_phenomenas, weather_phenomenas_colors, ~{
+          ggplot(df, aes_string(x = .x)) +
+            geom_histogram(bins=50, fill = .y) +
+            geom_vline(xintercept = mean(df[[.x]], na.rm = T), 
+                       color = "red", 
+                       linetype = "solid",
+                       linewidth = 0.5) +
+            labs(
+              title = paste0("Distribution of ", .x),
+              x = .x,
+              y = "Count"
+            ) +
+            scale_y_continuous(labels = comma) + 
+            theme_minimal() +
+            theme(axis.text.x = element_text(angle = 0, hjust = 1)) 
+        })
+
+        cowplot::plot_grid(
+          plotlist = plot_list,
+          labels = LETTERS[1:length(plot_list)],
+          label_size = 12,
+          ncol = 3,
+          align = 'vh'
+        )
+
+        rm(plot_list)
+    ```
+
+-   (15 points) Calculate the average departure delay for each **day** (Hint: think about which variables you need in order to do this!). Which day had the worst average length of delay for departures? Now calculate the averages by **day** and **origin**. Which airport had the worst single day for delays and when was it? Now calculate the averages by **hour** and **origin**. Which airport had the worst single hour for delays (and when was it)?
+
+    ```{r}
+    kable(head(flights %>% 
+                 group_by(year, month, day) %>%
+                 summarize(`Worst Average Depeature Delay` = round(mean(dep_delay, na.rm = T))) %>%
+                 rename(Year = year, Month = month, Day = day) %>%
+                 arrange(desc(`Worst Average Depeature Delay`)) %>%
+                 ungroup(), 
+               5),
+      align = "c", 
+      caption = "Top 5 Worst Depeature Delay (by Day)")
+    ```
+
+    [2013/3/8 has the worst average length for departures (average delay = 84)]{style="color:blue"}
+
+    ```{r}
+    kable(head(left_join(flights, airports, by=c("origin" = "faa")) %>%
+                 mutate(name = paste0(name, " (", origin, ")")) %>%
+                 group_by(year, month, day, name) %>%
+                 summarize(`Worst Average Depeature Delay` = round(mean(dep_delay, na.rm = T))) %>%
+                 rename(Year = year, Month = month, Day = day, Origin = name) %>%
+                 arrange(desc(`Worst Average Depeature Delay`)) %>%
+                 ungroup(), 
+               5),
+      align = "c", 
+      caption = "Top 5 Worst Depeature Delay (by Day and Origin)")
+    ```
+
+    [2013/3/8 at LGA has the worst average length for departures (average delay = 106)]{style="color:blue"}
+
+    ```{r}
+    kable(head(left_join(flights, airports, by=c("origin" = "faa")) %>%
+                 mutate(name = paste0(name, " (", origin, ")")) %>%
+                 group_by(year, month, day, hour, name) %>%
+                 summarize(`Worst Average Depeature Delay` = round(mean(dep_delay, na.rm = T))) %>%
+                 rename(Year = year, Month = month, Day = day, Origin = name) %>%
+                 arrange(desc(`Worst Average Depeature Delay`)) %>%
+                 ungroup(), 
+               5),
+      align = "c", 
+      caption = "Top 5 Worst Depeature Delay (by Hour and Origin)")
+    ```
+
+    [2013/7/22 at LGA at 18:00PM has the worst average length for departures (average delay = 310)]{style="color:blue"}
+
+-   (7 points) Compute the average delay by destination, then add that information to the `airports` data frame. Make a map showing the spatial distribution of delays (you can make it however you like, but we recommend using either `ggplot` or `leaflet`). Use the color of the points to display the average delay for each airport.
+
+    ```{r}
+    airports <- left_join(
+      airports, flights %>% 
+        group_by(dest) %>%
+        summarize(`Worst Average Depeature Delay` = round(mean(dep_delay, na.rm = T))) %>%
+        ungroup(), 
+      by = c("faa" = "dest")
+      )
+
+    quantile(airports$`Worst Average Depeature Delay`, na.rm=T)
+    ```
+
+    https://r-graph-gallery.com/182-add-circles-rectangles-on-leaflet-map.html
+
+    ```{r}
+    leaflet(data = airports) %>%
+       addTiles() %>%
+       setView(lng = -95, 
+               lat = 35, 
+               zoom = 4) %>%
+       addCircleMarkers(
+          ~lon, ~lat, 
+          radius = ~`Worst Average Depeature Delay`/2 , 
+          color = ~case_when(
+            `Worst Average Depeature Delay` <= 0   ~ "darkgreen",
+            `Worst Average Depeature Delay` > 0 & `Worst Average Depeature Delay` <= 19 ~ "orange",
+            `Worst Average Depeature Delay` > 19  ~ "red"),
+          stroke = TRUE, 
+          fillOpacity = 0.2,
+          popup = ~as.character(name)) 
+    ```
+
+-   (20 points) Finally, create as many plots and summary statistics as needed to answer the primary question above.
+
+    [*Which weather phenomena have the most impact on flight delays?*]{.underline}
+
+    [**Scatter Plot of Departure Delay on Weather Phenomena.** ]{style="color:blue"}
+
+    ```{r}
+        plot_list <- map2(weather_phenomenas, weather_phenomenas_colors, ~{
+          ggplot(df, aes_string(x = .x, y = "dep_delay")) +
+            geom_point(size = 0.5, alpha = 0.5, color = .y) +
+            geom_smooth(method = "lm", se = F, color = "red") +
+            labs(
+              title = paste(.x, "vs dep_delay"),
+              x = .x,
+              y = "Delay Time"
+            ) +
+            scale_y_continuous(labels = comma) + 
+            #coord_cartesian(ylim = c(-45, 1305)) +
+            theme_minimal() +
+            theme(axis.text.x = element_text(angle = 0, hjust = 1))
+        })
+
+        cowplot::plot_grid(
+          plotlist = plot_list,
+          labels = LETTERS[1:length(plot_list)],
+          label_size = 12,
+          ncol = 3,
+          align = 'vh'
+        )
+
+        rm(plot_list)
+    ```
+
+    [There are no strong linear relationships between departure delay and most weather phenomena.]{style="color:blue"}
+
+    -   [There appears to be a slight increase in departure delay during heavy precipitation.]{style="color:blue"}
+
+    [**Simple Linear Regression of Departure Delay on Weather Phenomena.** ]{style="color:blue"}
+
+    [Here, I performed a simple linear regression for each variable to see the exact effect size estimates and p-values:]{style="color:blue"}
+
+    ```{r}
+    result <- data.frame(Weather = character(), 
+                         Intercept = numeric(), 
+                         Slope = numeric(), 
+                         `P Value` = numeric(),
+                         `Variance Explained` = numeric())
+
+    for (x_var in weather_phenomenas) {
+      formula <- paste0("dep_delay ~ ",x_var)
+      res <- lm(formula, df)
+      b0  <- coef(summary(res))[[1, 1]] 
+      b1  <- coef(summary(res))[[2, 1]]
+      p   <- coef(summary(res))[[2, 4]]
+      r2  <- summary(res)$r.squared
+      result <- rbind(result, 
+                      data.frame(Weather   = x_var,
+                                 Intercept = round(b0, 3), 
+                                 Slope     = round(b1, 3), 
+                                 `P Value` = format(p, scientific = TRUE, digits = 3), 
+                                 `Variance Explained` = round(r2,3)) %>%
+                        mutate(Weather = ifelse(Weather == "temp", "Temperature", Weather), 
+                               Weather = ifelse(Weather == "dewp", "Dew Point", Weather), 
+                               Weather = ifelse(Weather == "humid", "Humidity", Weather), 
+                               Weather = ifelse(Weather == "wind_dir", "Wind Direction", Weather), 
+                               Weather = ifelse(Weather == "wind_speed", "Wind Speed", Weather), 
+                               Weather = ifelse(Weather == "wind_gust", "Wind Gust", Weather), 
+                               Weather = ifelse(Weather == "precip", "Precipitation", Weather), 
+                               Weather = ifelse(Weather == "pressure", "Pressure", Weather), 
+                               Weather = ifelse(Weather == "visib", "Visibility", Weather))
+                      )
+    }
+
+    kable(result, align = "c", caption = "Univariate Linear Regression for Weather Phenomenas")
+    ```
+
+    [P-Value and Variance Explained.]{style="color:blue"}
+
+    -   [The simple linear regression yields significant results on temperature, wind direction, wind speed, and wind gust, despite of small variance explained (r2) by any single variable.]{style="color:blue"}
+
+    [Effect Size Estimates.]{style="color:blue"}
+
+    -   [Effect size estimates]{style="color:blue"} [for most weather phenomena are small, except precipitation (β1=122.14). However, it is not significant (P=0).]{style="color:blue"}
+
+    [*Which weather phenomena have the most impact on flight delays?*]{.underline}
+
+    -   [Among all predictors, precipitation has the most impact (β1=122.14).]{style="color:blue"}
+
+    -   [Among significant predictors, wind speed has the most impact on flight delays (β1 = 0.343).]{style="color:blue"}
+
+    <https://www.geeksforgeeks.org/r-machine-learning/stepwise-regression-in-r/>
+
+    [**Step-Wise Selection of Departure Delay on Weather Phenomena.**]{style="color:blue"}
+
+    [Here, I performed a step-wise selection to access the joint effect of weather phenomena on departure delay.]{style="color:blue"}
+
+    ```{r}
+    initial_model  <- lm(paste("dep_delay ~", paste(weather_phenomenas, collapse = " + ")), 
+                         data = df)
+    summary(step(initial_model, direction = "both"))
+    ```
+
+    [All weather phenomena are included in the final model and they are overall significant (p \< 2.2e-16). However, only 2.5 % of the variances in departure delay are explained by the joint effect of all weather phenomena. Thus, departure delays are likely driven by non-weather factors.]{style="color:blue"}
+
+    ```{r}
+    rm(weather_phenomenas, weather_phenomenas_colors, result)
+    ```
+
+------------------------------------------------------------------------
+
+This homework has been adapted from the exercises presented in [Chapter 19](https://r4ds.hadley.nz/joins.html) of [R for Data Science (2e)](https://r4ds.hadley.nz/) by Wickham, Çentinkaya-Rundel, and Grolemund.
