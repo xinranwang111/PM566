@@ -228,7 +228,7 @@ For the rest of this assignment, the primary question you should keep in mind is
 
 Don’t try to answer it now, but use this question to guide your exploratory data analysis.
 
--   (7 points) In order to address our primary question, we want to prepare a tidy dataset (a single data frame). This will consist of information from the `flights` and `weather` data.
+5.  (7 points) In order to address our primary question, we want to prepare a tidy dataset (a single data frame). This will consist of information from the `flights` and `weather` data.
 
     The `year`, `month`, `day`, `hour`, and `origin` variables from `weather` provide *almost* enough information to give each observation a unique value. Create a new variable in the weather dataset by pasting together those 5 variables, then determine how many duplicated values there are and explain why.
 
@@ -306,7 +306,7 @@ Don’t try to answer it now, but use this question to guide your exploratory da
     rm(flights_tmp)
     ```
 
--   (20 points) On this merged dataset, perform steps 2-5 of the EDA checklist presented in class. Remember the context provided by our primary question above.
+6.  (20 points) On this merged dataset, perform steps 2-5 of the EDA checklist presented in class. Remember the context provided by our primary question above.
 
     -   Check the size of the data & Examine the variables and their types (step2-3)
 
@@ -371,7 +371,7 @@ Don’t try to answer it now, but use this question to guide your exploratory da
         rm(plot_list)
     ```
 
--   (15 points) Calculate the average departure delay for each **day** (Hint: think about which variables you need in order to do this!). Which day had the worst average length of delay for departures? Now calculate the averages by **day** and **origin**. Which airport had the worst single day for delays and when was it? Now calculate the averages by **hour** and **origin**. Which airport had the worst single hour for delays (and when was it)?
+7.  (15 points) Calculate the average departure delay for each **day** (Hint: think about which variables you need in order to do this!). Which day had the worst average length of delay for departures? Now calculate the averages by **day** and **origin**. Which airport had the worst single day for delays and when was it? Now calculate the averages by **hour** and **origin**. Which airport had the worst single hour for delays (and when was it)?
 
     ```{r}
     kable(head(flights %>% 
@@ -417,7 +417,7 @@ Don’t try to answer it now, but use this question to guide your exploratory da
 
     [2013/7/22 at LGA at 18:00PM has the worst average length for departures (average delay = 310)]{style="color:blue"}
 
--   (7 points) Compute the average delay by destination, then add that information to the `airports` data frame. Make a map showing the spatial distribution of delays (you can make it however you like, but we recommend using either `ggplot` or `leaflet`). Use the color of the points to display the average delay for each airport.
+8.  (7 points) Compute the average delay by destination, then add that information to the `airports` data frame. Make a map showing the spatial distribution of delays (you can make it however you like, but we recommend using either `ggplot` or `leaflet`). Use the color of the points to display the average delay for each airport.
 
     ```{r}
     airports <- left_join(
@@ -451,7 +451,7 @@ Don’t try to answer it now, but use this question to guide your exploratory da
           popup = ~as.character(name)) 
     ```
 
--   (20 points) Finally, create as many plots and summary statistics as needed to answer the primary question above.
+9.  (20 points) Finally, create as many plots and summary statistics as needed to answer the primary question above.
 
     ```{r}
         plot_list <- map2(weather_phenomenas, weather_phenomenas_colors, ~{
@@ -485,9 +485,6 @@ Don’t try to answer it now, but use this question to guide your exploratory da
     [***Which weather phenomena have the most impact on flight delays?***]{.underline}
 
     -   [There are no strong linear relationships between departure delay and most weather phenomena.]{style="color:blue"}
-
-    <!-- -->
-
     -   [There might be a slight increase in departure delay during heavy precipitation.]{style="color:blue"}
 
     ```{r}
