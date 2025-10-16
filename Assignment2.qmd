@@ -14,7 +14,7 @@ theme: cosmos
 
 ## **Due Date**
 
-This assignment is due by 11:59pm Pacific Time on Friday, October 10th, 2025.
+This assignment is due by 11:59pm Pacific Time on Wednesday, October 15th, 2025.
 
 ## Settings
 
@@ -318,15 +318,13 @@ Don’t try to answer it now, but use this question to guide your exploratory da
 
     -   [Out of 328k entries,]{style="color:blue"}
 
-        -   [\~1.5kentriesmissing in (1) Temperature (2) Dew Point (3) Humidity (4) Wind Speed and (5) Precipitation;]{style="color:blue"}
+        -   [\~1.5k entries missing in (1) Temperature (2) Dew Point (3) Humidity (4) Wind Speed and (5) Precipitation;]{style="color:blue"}
 
-        -   [\~9.5k entries missinginWind Direction;]{style="color:blue"}
+        -   [\~9.5k entries missing in Wind Direction;]{style="color:blue"}
 
         -   [\~36k entries missing in Pressure;]{style="color:blue"}
 
         -   [\~250k entries missing in Wind Gust]{style="color:blue"}
-
-    <!-- -->
 
     -   Look at the top and bottom of the data (step 4)
 
@@ -455,10 +453,6 @@ Don’t try to answer it now, but use this question to guide your exploratory da
 
 -   (20 points) Finally, create as many plots and summary statistics as needed to answer the primary question above.
 
-    [*Which weather phenomena have the most impact on flight delays?*]{.underline}
-
-    [**Scatter Plot of Departure Delay on Weather Phenomena.** ]{style="color:blue"}
-
     ```{r}
         plot_list <- map2(weather_phenomenas, weather_phenomenas_colors, ~{
           ggplot(df, aes_string(x = .x, y = "dep_delay")) +
@@ -486,13 +480,15 @@ Don’t try to answer it now, but use this question to guide your exploratory da
         rm(plot_list)
     ```
 
-    [There are no strong linear relationships between departure delay and most weather phenomena.]{style="color:blue"}
+    [**Scatter Plot of Departure Delay on Weather Phenomena.**]{style="color:blue"}
 
-    -   [There appears to be a slight increase in departure delay during heavy precipitation.]{style="color:blue"}
+    [***Which weather phenomena have the most impact on flight delays?***]{.underline}
 
-    [**Simple Linear Regression of Departure Delay on Weather Phenomena.** ]{style="color:blue"}
+    -   [There are no strong linear relationships between departure delay and most weather phenomena.]{style="color:blue"}
 
-    [Here, I performed a simple linear regression for each variable to see the exact effect size estimates and p-values:]{style="color:blue"}
+    <!-- -->
+
+    -   [There might be a slight increase in departure delay during heavy precipitation.]{style="color:blue"}
 
     ```{r}
     result <- data.frame(Weather = character(), 
@@ -529,33 +525,42 @@ Don’t try to answer it now, but use this question to guide your exploratory da
     kable(result, align = "c", caption = "Univariate Linear Regression for Weather Phenomenas")
     ```
 
-    [P-Value and Variance Explained.]{style="color:blue"}
+    [**Simple Linear Regression of Departure Delay on each of the Weather Phenomena.**]{style="color:blue"}
 
-    -   [The simple linear regression yields significant results on temperature, wind direction, wind speed, and wind gust, despite of small variance explained (r2) by any single variable.]{style="color:blue"}
+    -   [Here, I performed a simple linear regression for each variable to see the exact effect size estimates and p-values:]{style="color:blue"}
 
-    [Effect Size Estimates.]{style="color:blue"}
+    -   [**P-Value and Variance Explained.**]{style="color:blue"}
 
-    -   [Effect size estimates]{style="color:blue"} [for most weather phenomena are small, except precipitation (β1=122.14). However, it is not significant (P=0).]{style="color:blue"}
+        -   [The simple linear regression yields significant results on temperature, wind direction, wind speed, and wind gust, despite of small variance explained (r2) by any single variable.]{style="color:blue"}
 
-    [*Which weather phenomena have the most impact on flight delays?*]{.underline}
+    -   [**Effect Size Estimates.**]{style="color:blue"}
 
-    -   [Among all predictors, precipitation has the most impact (β1=122.14).]{style="color:blue"}
+        -   [Effect size estimates]{style="color:blue"} [for most weather phenomena are small, except huge effect size on precipitation (β1=122.14). ]{style="color:blue"}
+            -   [However, it is not significant (P=0).]{style="color:blue"}
 
-    -   [Among significant predictors, wind speed has the most impact on flight delays (β1 = 0.343).]{style="color:blue"}
+    [***Which weather phenomena have the most impact on flight delays?***]{.underline}
 
-    <https://www.geeksforgeeks.org/r-machine-learning/stepwise-regression-in-r/>
+    -   [Among all predictors, precipitation has the most impact (β1=122.14, p=0) on flight delays.]{style="color:blue"}
 
-    [**Step-Wise Selection of Departure Delay on Weather Phenomena.**]{style="color:blue"}
-
-    [Here, I performed a step-wise selection to access the joint effect of weather phenomena on departure delay.]{style="color:blue"}
+    -   [Among significant predictors, wind speed has the most impact on flight delays (β1 = 0.343, p=2.68e-161) on flight delays.]{style="color:blue"}
 
     ```{r}
-    initial_model  <- lm(paste("dep_delay ~", paste(weather_phenomenas, collapse = " + ")), 
+    initial_model <- lm(paste("dep_delay ~", paste(weather_phenomenas, collapse = " + ")), 
                          data = df)
     summary(step(initial_model, direction = "both"))
     ```
 
-    [All weather phenomena are included in the final model and they are overall significant (p \< 2.2e-16). However, only 2.5 % of the variances in departure delay are explained by the joint effect of all weather phenomena. Thus, departure delays are likely driven by non-weather factors.]{style="color:blue"}
+    [**Step-Wise Selection of Departure Delay on Weather Phenomena.**]{style="color:blue"}
+
+    <https://www.geeksforgeeks.org/r-machine-learning/stepwise-regression-in-r/>
+
+    -   [Here, I performed a step-wise selection to access the joint effect of weather phenomena on departure delay.]{style="color:blue"}
+
+    [***Which weather phenomena have the most impact on flight delays?***]{.underline}
+
+    -   [All weather phenomena are included in the final model and they are overall significant (p \< 2.2e-16). However, only 2.5 % of the variances in departure delay are explained by the joint effect of all weather phenomena.]{style="color:blue"}
+
+    -   [Thus, departure delays are likely driven by non-weather factors.]{style="color:blue"}
 
     ```{r}
     rm(weather_phenomenas, weather_phenomenas_colors, result)
