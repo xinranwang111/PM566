@@ -281,7 +281,7 @@ plot_grid(
 rm(plot_disease_distribution, plot_list, main_plot, plot_for_legend, legend)
 ```
 
-### **COVID-19 Death Count and Percentage by State (2020 - 2023), Weighted by Census Estimates**
+### **COVID-19 Death Count and Percentage (Weighted by Census Estimates), by State (2020 - 2023)**
 
 Additionally, I evaluated COVID-19 death count by State for all diseases. West Virginia, Alabama, Arizona, Mississippi, Tennessee were among the most severely affected States in 2021, each reporting COVID-19 mortality exceeding 0.37% of their population.
 
@@ -382,7 +382,7 @@ kable(df %>%
 
 ```
 
-### **Trends in Cause-Specific Mortality (Table: 2014 - 2019 vs 2020 - 2023, Plot: 2014 - 2023): Broad increases in Unclassified Symptoms, Diabetes, and Cerebrovascular Diseases**
+### **Trends in Cause-Specific Mortality (2014 - 2019 vs 2020 - 2023): Broad increases in Unclassified Symptoms, Diabetes, and Cerebrovascular Diseases**
 
 Here, I accessed mean weekly death for each disease before (2014-2019) and during (2020-2023) COVID-19 pandemic in the United States. The corresponding percentage change was also calculated.
 
@@ -413,6 +413,8 @@ kable(df %>%
   column_spec(1, width = "10cm")
 
 ```
+
+### **Trends in Cause-Specific Mortality (2014 - 2023)**
 
 Next, I examined mean weekly death for each disease per year in the United States. Note that mean weekly death were used instead of annual death count because only 37 weeks was recorded in 2023.
 
