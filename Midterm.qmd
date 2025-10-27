@@ -1,0 +1,1050 @@
+---
+title: "Midterm"
+author: "Xinran Wang"
+editor: visual
+format: 
+  html:
+    embed-resources: true
+    code-fold: true       
+    code-summary: "Show code"   
+    css: styles.css
+execute:
+  warning: false       
+  message: false  
+fig-width: 8
+fig-height: 6
+theme: cosmos
+---
+
+## **Midterm Project**
+
+Due **Sunday, October 26th, 2024** by 11:59pm Pacific Time.
+
+::: {style="text-align: justify;"}
+```{r}
+suppressPackageStartupMessages(library(data.table))
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(scales))
+suppressPackageStartupMessages(library(purrr))
+suppressPackageStartupMessages(library(tidycensus))
+
+suppressPackageStartupMessages(library(skimr))
+suppressPackageStartupMessages(library(knitr))
+suppressPackageStartupMessages(library(kableExtra))
+
+suppressPackageStartupMessages(library(ggmap))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(usmap))
+suppressPackageStartupMessages(library(cowplot))
+suppressPackageStartupMessages(library(RColorBrewer))
+```
+
+## **Introduction**
+
+**Background.** COVID-19 pandemic took millions of lives and has profound impact on global health. It also influenced mortality from other diseases through comorbidity, disruptions in health care access, and changes in life styles. In this analysis, I compare geotemporal mortlity patterns in the United States before (2014-2019) and during (2020-2023) COVID-19 pandemic to understand how overall and cause-specific death changed across time and region.
+
+**EDA.** The primary object of the exploratory data analysis is to check:
+
+-   Do we have death count for each year and each week?
+
+-   What is the distribution of weekly death count for each disease and each year? How do those distribution differ before and during COVID-19?
+
+-   What is the yearly death count / precentage (using Census estimates) for each State?
+
+**Analysis.** The primary object of this project is to evaluate:
+
+-   When dividing data to pre COVID-19 (2014 - 2019) and during COVID-19 (2020 - 2023) periods, what's the percent change in mean weekly death count for each disease?
+
+-   Is there temporal patterns for disease-specific death counts between 2014 - 2023? How do these patterns align with COVID-19 death pattern? Which month has the lowest/highest of weekly death? How do monthly death counts vary across each year?
+
+-   Which State has the highest disease-specific death (weighted by census estimation of population)? Is there any region disproportionately affected?
+
+## **Data Preparation**
+
+Weekly count of death by state and select causes in [2014-2019](https://data.cdc.gov/National-Center-for-Health-Statistics/Weekly-Counts-of-Deaths-by-State-and-Select-Causes/3yf8-kanr/about_data) vs [2020-2023](https://data.cdc.gov/National-Center-for-Health-Statistics/Weekly-Provisional-Counts-of-Deaths-by-State-and-S/muzy-jte6/about_data) were exported from CDC. US Census Estimates were pulled from `usmap` package.
+
+The data sets for 2020-2023 includes additional columns, COVID-19 (U071, Multiple Cause of Death) and COVID-19 (U071, Underlying Cause of Death), due to COVID19 pandemic. Additionally, deaths caused by influenza and pneumonia category changed from J10-J18 (2014-2019) to J09-J18 (2020-2023).
+
+Here, I converted **count of death columns** in both data sets from `chr` to `numeric` and **Week Ending Date** column in 2014-2019 data set from `chr` to `IDate`. Next, I manually added columns that were missing in either data set (i.e., present in one data set but not the other) and set their values to `NA`. Then, I create a new column named **Dataset Type** to distinguish data from `2015-2019` and `2020-2023`. Finally, I combined two data sets into one. Additionally, I created a new variable named **Influenza and pneumonia** that combines Influenza and pneumonia (J10-J18) from 2014-2019 and Influenza and pneumonia (J09-J18) from 2020-2023.
+
+```{r}
+idir      <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
+filename1 <- "Weekly_Counts_of_Deaths_by_State_and_Select_Causes,_2014-2019_20251015.csv"
+filename2 <- "Weekly_Provisional_Counts_of_Deaths_by_State_and_Select_Causes,_2020-2023_20251015.csv"
+
+df_2014_2019 <- fread(paste0(idir, "/", filename1))
+df_2020_2023 <- fread(paste0(idir, "/", filename2))
+
+# setequal(names(df_2014_2019), names(df_2020_2023))  # Check if colnames are same: No
+# setdiff(names(df_2014_2019), names(df_2020_2023))   # Columns in 2014-19 but not 2020-23
+# setdiff(names(df_2020_2023), names(df_2014_2019))   # Columns in 2020-23 but not 2014-19
+
+df_2014_2019 <- df_2014_2019 %>% 
+  mutate(across(5:17, ~ as.numeric(gsub(",", "", .x))),
+         `Dataset Type`                               = "2014-2019", 
+         `Influenza and pneumonia (J09-J18)`          = NA,
+         `Data As Of`                                 = NA, 
+         `COVID-19 (U071, Multiple Cause of Death)`   = NA, 
+         `COVID-19 (U071, Underlying Cause of Death)` = NA, 
+         `flag_cov19mcod`                             = NA, 
+         `flag_cov19ucod`                             = NA,
+         `Week Ending Date` = as.IDate(`Week Ending Date`, format = "%m/%d/%Y")) %>%
+  rename(`All Cause` = `All  Cause`) 
+
+df_2020_2023 <- df_2020_2023 %>% 
+  mutate(across(6:20, ~ as.numeric(gsub(",", "", .x))),
+         `Dataset Type`                               = "2020-2023", 
+         `Influenza and pneumonia (J10-J18)`          = NA)
+
+# setequal(names(df_2014_2019), names(df_2020_2023))  # Check if colnames are same: Yes
+
+df <- bind_rows(df_2014_2019, df_2020_2023)
+
+df <- df %>%
+    mutate(`Influenza and pneumonia` = 
+             coalesce(`Influenza and pneumonia (J09-J18)`,
+                      `Influenza and pneumonia (J10-J18)`),
+           `COVID` = rowSums(across(c(
+             `COVID-19 (U071, Multiple Cause of Death)`, 
+             `COVID-19 (U071, Underlying Cause of Death)`))))
+
+rm(df_2014_2019, df_2020_2023, filename1, filename2)
+
+disease_order <- c(
+  "All Cause",
+  "Natural Cause",
+  "Unclassified symptoms, signs and abnormal findings",
+  "Septicemia",
+  "Nephritis, nephrotic syndrome and nephrosis",
+  "Diabetes mellitus",
+  "Alzheimer disease",
+  "Cerebrovascular diseases",
+  "Malignant neoplasms",
+  "Diseases of heart",
+  "Other diseases of respiratory system",
+  "Influenza and pneumonia",
+  "Chronic lower respiratory diseases",
+  "COVID-19 (Multiple Cause of Death)",
+  "COVID-19 (Underlying Cause of Death)",
+  "COVID"
+  )
+
+years_palette <- viridisLite::plasma(10)
+years <- 2014:2023
+names(years_palette) <- years
+
+df <- df %>% 
+  rename(
+    Septicemia                 = `Septicemia (A40-A41)`,
+    `Malignant neoplasms`      = `Malignant neoplasms (C00-C97)`,
+    `Alzheimer disease`        = `Alzheimer disease (G30)`,
+    `Diabetes mellitus`        = `Diabetes mellitus (E10-E14)`,
+    `Diseases of heart`        = `Diseases of heart (I00-I09,I11,I13,I20-I51)`,
+    `Cerebrovascular diseases` = `Cerebrovascular diseases (I60-I69)`,
+    `Nephritis, nephrotic syndrome and nephrosis` = 
+      `Nephritis, nephrotic syndrome and nephrosis (N00-N07,N17-N19,N25-N27)`,
+    `Unclassified symptoms, signs and abnormal findings` = 
+      `Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified (R00-R99)`,
+    `Chronic lower respiratory diseases` = 
+      `Chronic lower respiratory diseases (J40-J47)`,
+    `Other diseases of respiratory system` = 
+      `Other diseases of respiratory system (J00-J06,J30-J39,J67,J70-J98)`,
+    `COVID-19 (Multiple Cause of Death)`   = `COVID-19 (U071, Multiple Cause of Death)`,
+    `COVID-19 (Underlying Cause of Death)` = `COVID-19 (U071, Underlying Cause of Death)`
+  ) %>%
+  select(c("Jurisdiction of Occurrence",
+           "MMWR Year",
+           "MMWR Week",
+           "Week Ending Date"),
+         any_of(disease_order), everything())
+```
+
+## **Exploratory Data Analysis**
+
+### **Check the Size of the Data, Examine Variables and Their Types, Look at the top and bottom of the data:**
+
+After combining and cleaning dataset from 2014-2019 and 2020-2023, the final data set contains 27,378 rows and 38 columns. The data include location information (USA and individual states), temporal patterns (year and week start date), weekly death count by various disease, and indicator flags for relevant diseases.
+
+Death counts are categorized as total (all-cause), natural cause, and 12 specific diseases. COVID-19 is further divided into multiple cause and underlying cause of deaths.
+
+```{r}
+#| results: "hide"
+
+# Skim everything except IDate column:
+skim(df %>% select(-`Week Ending Date`))
+
+# For IDate formatted column:
+print(paste0("Number of rows of Week Ending Date: ", length(df$`Week Ending Date`)))
+print(paste0("Completeness: ", 
+             length(!is.na(df$`Week Ending Date`)) / length(df$`Week Ending Date`)))
+str(df$`Week Ending Date`)
+summary(df$`Week Ending Date`)
+
+# Head and Tail
+head(df, 5)
+tail(df, 5)
+```
+
+### **Number of Weeks Reported**
+
+I began by checking number of weeks reported per year. All COVID-19 related categories shared the same number of weeks, as did all non-COVID diseases (although the the two groups differs from each other). Thus, I summarized the data by collapsing them into 2 rows: number of weeks for COVID and for non-COVID diseases.
+
+```{r}
+df_count_week <- df %>%
+  filter(`Jurisdiction of Occurrence` == "United States") %>%
+  rename(Year = `MMWR Year`, Week = `MMWR Week`) %>%
+  transmute(
+    Year, Week,
+    across(all_of(disease_order), ~ as.numeric(gsub(",", "", .x)))
+  ) %>%
+  arrange(Year, Week) %>%
+  group_by(Year) %>%
+  summarise(across(all_of(disease_order), ~ sum(!is.na(.x)))) %>%
+  ungroup() %>%
+  pivot_longer(-Year, names_to = "Disease", values_to = "Weeks") %>%
+  pivot_wider(names_from = Year, values_from = Weeks)
+
+df_count_week_collapsed <- df_count_week %>%
+  group_by(across(-Disease)) %>%   
+  summarise(Diseases = paste(Disease, collapse = ", ")) %>%
+  ungroup() %>%
+  select(Diseases, everything())
+
+kable(df_count_week_collapsed,
+      align = c("l", "c", "c", "c", "c", "c", "c", "c", "c", "c"),
+      caption = "Table 1. Number of Weeks Recorded in United States per Year") %>%
+  kable_styling(full_width = FALSE) %>%
+  column_spec(1, width = "10cm") 
+
+rm(df_count_week, df_count_week_collapsed)
+```
+
+### **Distribution of Weekly Death Count (2014 - 2023)**
+
+Then, I plotted the distribution of weekly death count for each disease from 2014 to 2023. Most diseases show a clear rightward shift from pre COVID-19 period to during COVID-19 period, except influenza and phenomena and chronic lower respiratory disease, which is likely due to public health measures implemented during COVID (such as mask wearing, physical distancing, etc). There is a significant decrease in weekly death count for COVID in 2023 (as compared to 2020 - 2022), likely due to reduced reporting (See Table 2).
+
+```{r}
+#| fig-width: 8
+#| fig-height: 6
+#| fig-align: center
+#| fig-cap: "<span style='color: grey;'><b>Figure 1. Distribution of Weekly Death Count in USA by Year.</b> X-axis represents weekly death count per year, y-axis represent number of weeks had the count within the year, color represent years. </span>"
+#| fig-cap-location: bottom
+
+plot_disease_distribution <- function(disease_col, bins = 30, show_legend = FALSE) {
+  if (grepl("COVID", disease_col, ignore.case = TRUE)) {
+    dat <- df %>% filter(`MMWR Year` >= 2020)
+  } else {
+    dat <- df
+  }
+  
+  dat <- dat %>%
+    rename(Year = `MMWR Year`) %>%
+    filter(`Jurisdiction of Occurrence` == "United States") %>%
+    transmute(
+      Year = factor(Year),  
+      Count = as.numeric(gsub(",", "", .data[[disease_col]]))
+    )
+
+  ggplot(dat, aes(x = Count, fill = Year)) +
+    geom_histogram(bins = bins, color = "white", alpha = 0.7, position = "identity") + 
+    labs(title = disease_col, x = "Weekly Death Count", y = "Count") +
+    scale_x_continuous(labels = scales::comma) +
+    scale_fill_manual(values = years_palette, drop = T) +
+    theme_minimal(base_size = 8) +
+    theme(
+      plot.title  = element_text(size = 8, face = "bold"),
+      axis.text.x = element_text(size = 8, angle = 45, hjust = 1),
+      axis.text.y = element_text(size = 8),
+      legend.position = if (show_legend) "bottom" else "none"
+    )
+}
+
+plot_list <- lapply(disease_order, plot_disease_distribution, bins = 30)
+main_plot <- plot_grid(
+  plotlist = plot_list,
+  ncol=4
+  )
+
+plot_for_legend <- plot_disease_distribution(disease_order[1], 30, show_legend = T) +
+  ggplot2::theme(legend.position = "bottom")
+legend <- cowplot::ggdraw(get_plot_component(plot_for_legend, 'guide-box-bottom', return_all = TRUE))
+
+plot_grid(
+  plotlist = c(main_plot, legend),
+  ncol=1,
+  label_size = 8,                           
+  label_fontface = "bold", 
+  rel_heights = c(1, 0.1)
+)
+
+rm(plot_disease_distribution, plot_list, main_plot, plot_for_legend, legend)
+```
+
+### **COVID-19 Death Count and Percentage by State (2020 - 2023), Weighted by Census Estimates**
+
+Additionally, I evaluated COVID-19 death count by State for all diseases. West Virginia, Alabama, Arizona, Mississippi, Tennessee were among the most severely affected States in 2021, each reporting COVID-19 mortality exceeding 0.37% of their population.
+
+```{r}
+df_year <- df %>%
+  filter(`Jurisdiction of Occurrence` != "United States") %>%
+  rename(
+    State = `Jurisdiction of Occurrence`,
+    Year  = `MMWR Year`,
+    Week  = `MMWR Week`
+  ) %>%
+  transmute(
+    State,
+    Year,
+    across(all_of(disease_order), ~ as.numeric(gsub(",", "", .x)))
+  ) %>%
+  group_by(State, Year) %>%
+  summarise(across(all_of(disease_order), sum, na.rm = TRUE)) %>%
+  ungroup %>%
+  pivot_longer(all_of(disease_order), 
+               names_to = "Disease", 
+               values_to = "Count") %>%
+  pivot_wider(
+    names_from  = c(Disease, Year),
+    values_from = Count,
+    names_sep   = " "
+  ) %>%
+  arrange(State)
+
+#
+df_pop <- map_dfr(
+  2020:2023,
+  ~ get_estimates(geography = "state", product = "population", year = .x) %>%
+    filter(variable == "POPESTIMATE") %>%
+    transmute(State = NAME, Year = .x, Population = value)
+  )
+  
+df_pop <- df_pop %>%
+  tidyr::pivot_wider(names_from = Year, values_from = Population,
+                     names_prefix = "Population ")
+
+kable(left_join(
+  df_year %>% 
+    select(State, matches("COVID 202")) %>%
+    rename_with(~ gsub("COVID ", "", .x)), 
+  df_pop, 
+  by = "State") %>%
+    mutate(
+      `2020 Count (%)` = paste0(format(`2020`, big.mark=","), " (", 
+                      format(round((`2020` / `Population 2020`) * 100, 2), 
+                             big.mark=","), "%)"), 
+      `2021 Count (%)` = paste0(format(`2021`, big.mark=","), " (", 
+                      format(round((`2021` / `Population 2021`) * 100, 2), 
+                             big.mark=","), "%)"),
+      `2022 Count (%)` = paste0(format(`2022`, big.mark=","), " (", 
+                      format(round((`2022` / `Population 2022`) * 100, 2), 
+                             big.mark=","), "%)"), 
+      `2023 Count (%)` = paste0(format(`2023`, big.mark=","), " (", 
+                      format(round((`2023` / `Population 2023`) * 100, 2), 
+                             big.mark=","), "%)")) %>%
+    select(c(State, `2020 Count (%)`, `2021 Count (%)`, `2022 Count (%)`, `2023 Count (%)`)),
+  align = c("l", "c", "c", "c"), 
+  caption = "Table 2. COVID Death by State (2020-2023)")
+```
+
+## **Preliminary Results**
+
+### **All-Cause Mortality in United States (2014 - 2023): Peaking in 2021 with Consistent Winter Highs**
+
+First, I evaluate the trend of weekly all cause mortality from 2014 to 2023 in the United States. Overall, summer months (June - August) tends to have fewest death, whereas winter (December - January) tends to have the highest number of deaths. December 2020 - January 2021 were the peak periods of COVID-19 impact, with weekly deaths reaching 87,033 in December and 87,415 in January.
+
+```{r}
+kable(df %>%
+        filter(`Jurisdiction of Occurrence` == "United States") %>%
+        mutate(Month = month(as.Date(`Week Ending Date`) - 3, label = TRUE, abbr = TRUE)) %>%
+        rename(Year = `MMWR Year`) %>%
+        group_by(Year) %>%
+        summarize(
+          `Min (Mo.)` = paste0(format(round(min(`All Cause`, na.rm = TRUE), 0), 
+                                      big.mark=","), 
+                               " (", Month[which.min(`All Cause`)], ".)"),
+          `1st quartile` = format(round(quantile(`All Cause`, 0.25, na.rm = TRUE),0), 
+                                  big.mark=","),
+          `Median`       = format(round(quantile(`All Cause`, 0.5,  na.rm = TRUE), 0), 
+                                  big.mark=","),
+          `Mean`         = format(round(mean(`All Cause`, na.rm = TRUE),0), big.mark=","),
+          `3rd quartile` = format(round(quantile(`All Cause`, 0.75, na.rm = TRUE),0), 
+                                  big.mark=","),
+          `Max (Mo.)`    = paste0(format(round(min(`All Cause`, na.rm = TRUE), 0), 
+                                         big.mark=","),
+                                  " (", Month[which.max(`All Cause`)], ".)"),
+          `Mean (SD)`    = paste0(Mean, " (", round(sd(`All Cause`,na.rm = TRUE), 0), ")")) %>%
+        select(Year, `Min (Mo.)`, `1st quartile`, `Mean (SD)`, everything()),
+  caption = "Table 3. Summary Statistics of Weekly All Cause Death (2014-2023) in United States",
+  align = "c")
+          
+          
+
+```
+
+### **Trends in Cause-Specific Mortality (Table: 2014 - 2019 vs 2020 - 2023, Plot: 2014 - 2023): Broad increases in Unclassified Symptoms, Diabetes, and Cerebrovascular Diseases**
+
+Here, I accessed mean weekly death for each disease before (2014-2019) and during (2020-2023) COVID-19 pandemic in the United States. The corresponding percentage change was also calculated.
+
+Both all causes of death and nature cause of death increased approximately 19%. Most diseases showed an overall percentage increase (greater than population growth rate of 0.52%) in deaths. Specifically, there was substantial increase in mortality from unclassified symptoms, signs and abnormal findings, diabetes mellitus, other diseases of respiratory system, cerebrovascular diseases (36.58%, 22.29%, 15.7%, 13.09% increase, respectively). Mortality due Influenza and chronic lower respiratory disease decreased by 14.58% and 5.7%, likely due to death being re-classified as COVID-19 related deaths (either as multiple or underlying causes).
+
+```{r}
+kable(df %>%
+        dplyr::filter(`Jurisdiction of Occurrence` == "United States") %>%
+        group_by(`Dataset Type`) %>%
+        summarise(
+          across(all_of(disease_order), 
+                 ~ round(mean(as.numeric(.x), na.rm = TRUE),2), 
+                 .names = "{col}")) %>%
+        ungroup() %>%
+        pivot_longer(-`Dataset Type`, 
+                     names_to = "Variable", 
+                     values_to = "Mean") %>%
+        pivot_wider(names_from = `Dataset Type`, 
+                    values_from = Mean) %>%
+        mutate(`% Change` = 
+                 paste0(
+                   round(((`2020-2023` - `2014-2019`) / `2014-2019`) * 100, 2), "%"),
+               `2014-2019` = format(round(`2014-2019`, 0), big.mark = ","),
+               `2020-2023` = format(round(`2020-2023`, 0), big.mark = ",")),
+      caption = "Table 4. Summary Statistics of Mean Weekly Mortality (Before vs During COVID-19) in United States",
+      align = c("l", "c", "c", "c")) %>%
+  kable_styling(full_width = FALSE) %>%
+  column_spec(1, width = "10cm")
+
+```
+
+Next, I examined mean weekly death for each disease per year in the United States. Note that mean weekly death were used instead of annual death count because only 37 weeks was recorded in 2023.
+
+I observed similar trends all-cause and natural-cause mortality, as well as death due to nephritis, nephrotic syndrome and nephrosis, diabetes mellitus, cerebrovascular diseases, malignant neoplass, diseases of the heart. Mortality showed slightly upward trend during pre COVID-19 years (2014-2019), followed by a sharp increase from 2019-2020. The upward trend continued at a slower rate between 2020-2021 and declined from 2021-2023. However, mortality levels remained higher than those in 2019, consistent with the pre COVID-19 increasing trend.
+
+There is similar pattern for other disease with respiratory system, except that mortality did not decline after 2021. Septicemia exhibited a sharp decline in 2019, followed by a steady rise from 2020-2022, peaking in 2022, which aligns with the context of COVID-19 as Septicemia can result from an excessive immune response. Mortality due to Alzheimer's disease showed a substantial increase in 2020. Deaths due to influenza and pneumonia and chronic lower respiratory diseases declined, likely due to public health measures. Deaths attributable to unclassified symptoms, signs and abnormal findings rose sharply in 2023.
+
+**Patterns by year**
+
+```{r}
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+#| fig-cap: "<span style='color: grey;'><b>Figure 2. Mean Weekly Death Count by Year. </b> X-axis represent year (2014-2023), y-axis represents mean weekly death count. </span>"
+#| fig-cap-location: bottom
+
+################## Average Weekly Death per Year
+plot_disease_yearly <- function(disease_col, line_col = "steelblue") {
+  
+  dat <- df %>%
+    filter(`Jurisdiction of Occurrence` == "United States") %>%
+    transmute(
+      `MMWR Year`,
+      `Week Ending Date`,
+      Count = as.numeric(gsub(",", "", .data[[disease_col]])) 
+    ) %>%
+    group_by(`MMWR Year`) %>%
+    summarise(
+      Mean  = mean(Count, na.rm = TRUE),
+      SD    = sd(Count,   na.rm = TRUE),
+      SE    = SD / sqrt(sum(!is.na(Count)))
+    ) %>%
+    ungroup() %>%
+    rename(Year = `MMWR Year`)
+    
+  ggplot(dat, aes(x = Year, y = Mean)) +
+    geom_line(linewidth = 1, color = line_col) +
+    geom_point(size = 2, color = line_col) +
+    geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE),
+                  width = 0.2, color = line_col) +
+    labs(
+      title = disease_col,
+      x = "Year",
+      y = "Avg Weekly Death Count"
+    ) +
+    scale_x_continuous(breaks = 2014:2023, limits = c(2014, 2023)) +
+    theme_minimal(base_size = 8) +
+    theme(plot.title  = element_text(size = 8, face = "bold"),
+          axis.text.x = element_text(hjust = 1, angle = 45)) 
+}
+
+plots_list <- map(disease_order, plot_disease_yearly)
+
+plot_grid(
+  plotlist = plots_list,
+  ncol = 4,
+  align = "hv",
+  labels = paste0(LETTERS[seq_along(plots_list)], "."),
+  label_x = 0, hjust = 0, label_size = 8
+)
+
+rm(plot_disease_yearly, plots_list)
+```
+
+**Patterns by Month and Year**
+
+Since Table 3 shows that the minimum weekly death count typically occur during summer and the maximized during winter, I further examined seasonal pattern by plotting monthly death counts by month and year.
+
+The results showed U-shaped trend in monthly deaths, with lowest in summer and highest in winter, for all death count categories except malignant neoplasms. Additionally, the death count for 2020-2023 is generally higher than than those for 2014-2019, consistent with the findings in Table 4.
+
+```{r}
+#| fig-width: 8
+#| fig-height: 16
+#| fig-align: center
+#| fig-cap: "<span style='color: grey;'><b>Figure 3. Monthly Death Count by Month and Year. </b> X-axis represents month of the year, y-axis represents monthly death count, color represent years from 2014-2023. To improve clarity, the plot is divided into twp panels: 2014-2019 (left) and 2020-2023 (right). The shaded grey area indivates min and max month death count in 2014-2019.</span>"
+#| fig-cap-location: bottom
+################## Average Monthly Death per Year
+plot_disease_monthly <- function(disease_col, show_legend = FALSE, year_start, year_end) {
+  
+  dat <- df %>%
+    filter(`Jurisdiction of Occurrence` == "United States") %>%
+    transmute(
+      `MMWR Year`,
+      `Week Ending Date`,
+      Month = month(as.Date(`Week Ending Date`)),
+      Year = as.character( `MMWR Year`),
+      #Weekly_Count = as.numeric(gsub(",", "", `All Cause`))
+      Weekly_Count = as.numeric(gsub(",", "", .data[[disease_col]]))
+    ) %>%
+    group_by(Year, Month) %>%
+    summarize(Monthly_Count = sum(Weekly_Count, na.rm=T)) %>%
+    ungroup()
+  
+  ymax <- max(dat$Monthly_Count, na.rm=T)
+  ymin <- min(dat$Monthly_Count, na.rm=T) 
+  
+  ymax_2014_2019 <- (dat %>%
+    filter(Year >= 2014, Year <= 2019) %>%
+    summarise(ymax = max(Monthly_Count, na.rm = TRUE)))$ymax
+  ymin_2014_2019 <- (dat %>%
+    filter(Year >= 2014, Year <= 2019) %>%
+    summarise(ymin = min(Monthly_Count, na.rm = TRUE)))$ymin
+  
+  dat <- dat %>% filter(Year >= year_start & Year <= year_end) 
+    
+  ggplot(dat, aes(x = Month, y = Monthly_Count, color = Year, group = Year)) +
+    geom_hline(yintercept = ymax_2014_2019, linewidth = 0.5, color = "grey") +
+    geom_hline(yintercept = ymin_2014_2019, linewidth = 0.5, color = "grey") +
+    annotate("rect", xmin = -Inf, xmax = Inf, ymin = ymin_2014_2019, ymax = ymax_2014_2019,
+           alpha = 0.2, fill = "lightgrey") +
+    geom_line(linewidth = 0.5, alpha = 0.7) +
+    geom_point(size = 1) +
+    labs(
+      title = disease_col,
+      subtitle = paste0(year_start, "-", year_end),
+      x = "Month",
+      y = "Monthly Death Count"
+    ) +
+    scale_color_manual(values = years_palette, drop = T) +
+    scale_x_continuous(breaks = 1:12, limits = c(1, 12)) +
+    scale_y_continuous(labels = comma, limits = c(ymin, ymax)) +
+    theme_minimal(base_size = 8) +
+    theme(
+      plot.title  = element_text(size = 8, face = "bold"),
+      axis.text.x = element_text(size = 8, angle = 45, hjust = 1),
+      axis.text.y = element_text(size = 8),
+      legend.position = if (show_legend) "bottom" else "none"
+    )
+}
+
+#
+plots_list_2014_2019_1 <- map(disease_order[1:8], ~ plot_disease_monthly(.x, FALSE, 2014, 2019))
+main_plot_2014_2019_1 <- plot_grid(
+  plotlist = plots_list_2014_2019_1,
+  ncol = 1,
+  align = "hv",
+  labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
+  label_x = 0, hjust = 0, label_size = 8
+)
+
+plots_list_2014_2019_2 <- map(disease_order[9:16], ~ plot_disease_monthly(.x, FALSE, 2014, 2019))
+main_plot_2014_2019_2 <- plot_grid(
+  plotlist = plots_list_2014_2019_2,
+  ncol = 1,
+  align = "hv",
+  labels = c("I", "J", "K", "L", "M", "N", "O", "P"),
+  label_x = 0, hjust = 0, label_size = 8
+)
+
+#
+plots_list_2020_2023_1 <- map(disease_order[1:8], ~ plot_disease_monthly(.x, FALSE, 2020, 2023))
+main_plot_2020_2023_1 <- plot_grid(
+  plotlist = plots_list_2020_2023_1,
+  ncol = 1,
+  align = "hv",
+  label_x = 0, hjust = 0, label_size = 8
+)
+
+plots_list_2020_2023_2 <- map(disease_order[9:16], ~ plot_disease_monthly(.x, FALSE, 2020, 2023))
+main_plot_2020_2023_2 <- plot_grid(
+  plotlist = plots_list_2020_2023_2,
+  ncol = 1,
+  align = "hv",
+  label_x = 0, hjust = 0, label_size = 8
+)
+
+#
+plot_for_legend <- plot_disease_monthly(disease_order[1], TRUE, 2014, 2023) +
+  ggplot2::theme(legend.position = "bottom")
+legend <- cowplot::ggdraw(get_plot_component(plot_for_legend, 'guide-box-bottom', return_all = TRUE))
+
+#
+merged_plot <- plot_grid(
+  plotlist = c(main_plot_2014_2019_1, main_plot_2020_2023_1, 
+               main_plot_2014_2019_2, main_plot_2020_2023_2),
+  ncol=4,
+  label_size = 8,                           
+  label_fontface = "bold"
+)
+
+#
+plot_grid(
+  plotlist = c(merged_plot, legend),
+  ncol=1,
+  label_size = 8,                           
+  label_fontface = "bold", 
+  rel_heights = c(1, 0.1)
+)
+
+rm(plot_disease_monthly, dat,
+   ymin, ymax, ymin_2014_2019, ymax_2014_2019,
+   plots_list_2014_2019_1, plots_list_2014_2019_2, 
+   main_plot_2014_2019_1, main_plot_2014_2019_2,
+   plots_list_2020_2023_1, plots_list_2020_2023_2,
+   main_plot_2020_2023_1, main_plot_2020_2023_2,
+   plot_for_legend, merged_plot)
+```
+
+### **Patterns of Weekly Death Counts (2014 - 2023): Consistent Winter Peaks, a Surge in Unclassified Causes in 2023, and a Stronger and Broader Peaks Aligning with COVID-19 in Cerebrovascular Disease, Heart Disease, and All-Cause Mortality**
+
+Here, I evaluated mortality by disease and by week of the year in the United States. Weekly mortality counts was divided by five categories: (1) mortality of nature cause or all causes, (2) mortality attributable to respiratory diseases, (3) mortality attributable to COVID-19, (4) mortality attributable to other diseases with lower mortality counts, and (5) mortality attributable to other diseases with higher mortality counts. The categorization was applied as mortality differ across various causes of death.
+
+There was a clear overlapping temporal pattern across most diseases in the heat map, with most deaths during in the winter, except for mortality due to (1) malignant neoplasms and (2) unclassified symptoms, signs, and abnormal findings. It is concerning that mortality due to unclassified symptoms, signs, and abnormal findings, increased dramatically in 2023 to over 3000. Signals for all cause mortality, natural cause mortality, and mortality from cerebrovascular disease and heart disease intensified during COVID-19 period (brighter color), while mortality from diabetes mellitus persisted for a longer duration during COVID-19 (wider peak signal).
+
+```{r}
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+#| fig-cap: "<span style='color: grey;'><b>Figure 4. Heatmap for Disease and Weekly Disease Count. </b> X-axis represents year (2019-2023), y-axis represents diseases, color represents weekly death count. </span>"
+#| fig-cap-location: bottom
+df_week <- df %>%
+  filter(`Jurisdiction of Occurrence` == "United States") %>%
+  select(`Week Ending Date`, all_of(disease_order)) %>%  
+  pivot_longer(
+    cols = all_of(disease_order),
+    names_to  = "Disease",
+    values_to = "Weekly Death Count"
+  ) %>%
+  rename(Year = `Week Ending Date`)
+
+mortality <- c(
+  "All Cause",
+  "Natural Cause"
+  )
+
+disease_respiratory <- c(
+  "Other diseases of respiratory system",
+  "Influenza and pneumonia",
+  "Chronic lower respiratory diseases"
+  )
+
+disease_covid <- c(
+  "COVID-19 (Multiple Cause of Death)",
+  "COVID-19 (Underlying Cause of Death)",
+  "COVID"
+  )
+
+disease_other1 <- c(
+  "Septicemia",
+  "Diabetes mellitus",
+  "Alzheimer disease",
+  "Cerebrovascular diseases",
+  "Nephritis, nephrotic syndrome and nephrosis",
+  "Unclassified symptoms, signs and abnormal findings"
+  )
+
+disease_other2 <- c(
+  "Malignant neoplasms",
+  "Diseases of heart"
+  )
+
+p1 <- ggplot(df_week %>% filter(Disease %in% mortality), 
+       aes(Year, Disease, fill = `Weekly Death Count`)) +
+  geom_tile() +
+  geom_vline(xintercept = as.Date("2020-01-30"), color = "red", linewidth = 1) +  
+  annotate("text", 
+           x = as.Date("2020-02-28"), y = 2,          
+           label = "COVID-19 Begins", 
+           color = "red", 
+           hjust = 0, 
+           size = 3, 
+           fontface = "bold") +
+  scale_fill_viridis_c(option = "C",
+                       guide = guide_colorbar(
+                         barwidth = unit(10, "cm"),  
+                         barheight = unit(0.3, "cm") 
+                         )) +
+  scale_x_date(
+    breaks = as.Date(paste0(2014:2023, "-01-01")), 
+    labels = date_format("%Y"),
+    limits = as.Date(c("2013-12-25", "2024-01-05")),
+    expand = c(0, 0)
+  ) +
+  labs(x = "Year", 
+       y = "Disease", 
+       fill = "Weekly Death Count") +
+  theme_minimal(base_size = 10) +
+  theme(axis.text.x = element_text(hjust = 1, angle = 0),
+        legend.position = "top" ) 
+
+p2 <- ggplot(df_week %>% 
+               filter(Disease %in% disease_respiratory),
+             aes(Year, Disease, fill = `Weekly Death Count`)) +
+  geom_tile() +
+  geom_vline(xintercept = as.Date("2020-01-01"), color = "red", linewidth = 1) +  
+  annotate("text", 
+           x = as.Date("2020-01-30"), y = 2.8,          
+           label = "COVID-19 Begins", 
+           color = "red", 
+           hjust = 0, 
+           size = 3, 
+           fontface = "bold") +
+  scale_fill_viridis_c(option = "D",
+                       guide = guide_colorbar(
+                         barwidth = unit(10, "cm"),  
+                         barheight = unit(0.3, "cm") 
+                         )) +
+  scale_x_date(
+    breaks = as.Date(paste0(2014:2023, "-01-01")),  # ticks at Jan 1 each year
+    labels = date_format("%Y"),
+    limits = as.Date(c("2013-12-25", "2024-01-05")),
+    expand = c(0, 0)
+  ) +
+  labs(x = "Year", 
+       y = "Disease", 
+       fill = "Weekly Death Count") +
+  theme_minimal(base_size = 10) +
+  theme(axis.text.x = element_text(hjust = 1, angle = 0),
+        legend.position = "top" ) 
+
+p3 <- ggplot(df_week %>% filter(Disease %in% disease_covid), 
+       aes(Year, Disease, fill = `Weekly Death Count`)) +
+  geom_tile() +
+  geom_vline(xintercept = as.Date("2020-01-01"), color = "red", linewidth = 1) +  
+  annotate("text", 
+           x = as.Date("2020-02-01"), y = 2.8,          
+           label = "COVID-19 Begins", 
+           color = "red", 
+           hjust = 0, 
+           size = 3, 
+           fontface = "bold") +
+  scale_fill_viridis_c(option = "A",
+                       na.value = "lightgrey",   
+                       guide = guide_colorbar(
+                         barwidth = unit(10, "cm"),  
+                         barheight = unit(0.3, "cm") 
+                         )) +
+  scale_x_date(
+    breaks = as.Date(paste0(2020:2023, "-01-01")),  # ticks at Jan 1 each year
+    labels = date_format("%Y"),
+    limits = as.Date(c("2013-12-25", "2024-01-05")),
+    expand = c(0, 0)
+  ) +
+  labs(x = "Year", 
+       y = "Disease", 
+       fill = "Weekly Death Count") +
+  theme_minimal(base_size = 10) +
+  theme(axis.text.x = element_text(hjust = 1, angle = 0),
+        legend.position = "top" ) 
+
+p4 <- ggplot(df_week %>% filter(Disease %in% disease_other1), 
+       aes(Year, Disease, fill = `Weekly Death Count`)) +
+  geom_tile() +
+  geom_vline(xintercept = as.Date("2020-01-01"), color = "red", linewidth = 1) +  
+  annotate("text", 
+           x = as.Date("2020-01-30"), y = 5.8,          
+           label = "COVID-19 Begins", 
+           color = "red", 
+           hjust = 0, 
+           size = 3, 
+           fontface = "bold") +
+  scale_fill_viridis_c(option = "F",
+                       guide = guide_colorbar(
+                         barwidth = unit(10, "cm"),  
+                         barheight = unit(0.3, "cm") 
+                         )) +
+  scale_x_date(
+    breaks = as.Date(paste0(2014:2023, "-01-01")),  # ticks at Jan 1 each year
+    labels = date_format("%Y"),
+    limits = as.Date(c("2013-12-25", "2024-01-05")),
+    expand = c(0, 0)
+  ) +
+  labs(x = "Year", 
+       y = "Disease", 
+       fill = "Weekly Death Count") +
+  theme_minimal(base_size = 10) +
+  theme(axis.text.x = element_text(hjust = 1, angle = 0),
+        legend.position = "top" ) 
+
+
+p5 <- ggplot(df_week %>% filter(Disease %in% disease_other2), 
+       aes(Year, Disease, fill = `Weekly Death Count`)) +
+  geom_tile() +
+  geom_vline(xintercept = as.Date("2020-01-01"), color = "red", linewidth = 1) +  
+  annotate("text", 
+           x = as.Date("2020-01-30"), y = 2,          
+           label = "COVID-19 Begins", 
+           color = "red", 
+           hjust = 0, 
+           size = 3, 
+           fontface = "bold") +
+  scale_fill_viridis_c(option = "E",
+                       guide = guide_colorbar(
+                         barwidth = unit(10, "cm"),  
+                         barheight = unit(0.3, "cm") 
+                         )) +
+  scale_x_date(
+    breaks = as.Date(paste0(2014:2023, "-01-01")),
+    labels = date_format("%Y"),
+    limits = as.Date(c("2013-12-25", "2024-01-05")),
+    expand = c(0, 0)
+  ) +
+  labs(x = "Year", 
+       y = "Disease", 
+       fill = "Weekly Death Count") +
+  theme_minimal(base_size = 10) +
+  theme(axis.text.x = element_text(hjust = 1, angle = 0),
+        legend.position = "top" ) 
+
+
+plot_grid(p1, p2, p3, p4, p5,
+          labels = c("A. Mortality of Natural Cause vs. All Cause",
+                     "B. Mortality Attributable to Respiratory Diseases", 
+                     "C. Mortality Attributable to COVID-19", 
+                     "D. Mortality Attributable to Other Diseases",
+                     "E. Mortality Attributable to Other Diseases cont."),
+          label_x = 0,    
+          label_y = 1,     
+          hjust = 0,        
+          label_size = 10, 
+          label_fontface = "bold",
+          ncol = 1, 
+          align = "v",
+          rel_heights = c(1.3, 1.4, 1.4, 1.8, 1.3))
+
+rm(p1, p2, p3, p4, p5)
+```
+
+### **Disease-Specific Yearly Death Rates Weighted by Census Population Estimates Reveal Disproportionately High Mortality in West Virginia.**
+
+To further access geographical variability, one disease was selected from each of the five categories in the plot above. Yearly death counts was weighted by corresponding census population estimates and then log-transformed.
+
+Data from 2021 were used for all-cause mortality and mortality due to chronic lower respiratory disease, COVID-19, and heart disease. Data from 2023 were used for mortality due to unclassified symptoms, signs, and abnormal findings.
+
+The results revealed disporportionally high mortality in West Virgina across all 5 mortality categories evaluated. Additionally, there is elevated all-cause mortality and mortality due to chronic lower respiratory disease, COVID-19, and heart disease in southeastern side of the United States, particularly in West Virginia, Mississippi, Alabama, Oklahoma, Arkansas, Tennessee, and Kentucky. Mortality due to unclassified symptoms, signs, and abnormal findings was highest in Oklahoma, West Virginia and North Carolina.
+
+```{r}
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+#| fig-cap: "<span style='color: grey;'><b>Figure 5. Mortality Weighted by Census Population Estimates for Selected Diseases. </b>Color represent log transformed mortality (weighted by census estimates). </span>"
+#| fig-cap-location: bottom
+
+# https://api.census.gov/data/key_signup.html
+# census_api_key("14ff972ad235695086e726484ed8f894d6d96212", install = TRUE)
+
+df_2021 <- left_join(df_year %>%
+                       select(State, matches("2021")) %>%
+                       rename_with(~ gsub(" 20(1[4-9]|2[0-3])$", "", .x)), 
+                     df_pop %>% select(State, `Population 2021`),
+                     by = "State") %>% 
+  transmute(state = State,
+            Population = `Population 2021`,
+            across(
+              all_of(disease_order),
+              ~ as.numeric(gsub(",", "", .x)), 
+              .names = "{col}"), 
+            across(
+              all_of(disease_order),
+              ~ .x / as.numeric(Population), 
+              .names = "Weighted {col}"))
+
+df_2023 <- left_join(df_year %>%
+                       select(State, matches("2023")) %>%
+                       rename_with(~ gsub(" 20(1[4-9]|2[0-3])$", "", .x)), 
+                     df_pop %>% select(State, `Population 2023`),
+                     by = "State") %>% 
+  transmute(state = State,
+            Population = `Population 2023`,
+            across(
+              all_of(disease_order),
+              ~ as.numeric(gsub(",", "", .x)), 
+              .names = "{col}"), 
+            across(
+              all_of(disease_order),
+              ~ .x / as.numeric(Population), 
+              .names = "Weighted {col}"))
+
+p1 <- plot_usmap(data = df_2021, 
+                 regions = "states", 
+                 values = "Weighted All Cause") + 
+  scale_fill_viridis_c(option = "C",
+                       na.value = "lightgrey",
+                       guide = guide_colorbar(
+                         barwidth = unit(10, "cm"),  
+                         barheight = unit(0.3, "cm") 
+                         )) +
+  theme(legend.position = 'top') +
+  labs(fill = 'All Cause Mortality (2021)') +
+  guides(
+    fill = guide_colorbar(
+      title.position = "top", 
+      title.hjust = 0.5,      
+      barwidth = unit(10, "cm"),
+      barheight = unit(0.3, "cm")
+    )
+  ) +
+  theme(
+    legend.position = "top",
+    legend.title = element_text(size = 8, face = "bold"),
+    legend.text  = element_text(size = 8)
+  )
+
+
+p2 <- plot_usmap(data = df_2021, 
+                 regions = "states", 
+                 values = "Weighted Chronic lower respiratory diseases") + 
+  scale_fill_viridis_c(option = "D",
+                       na.value = "lightgrey",
+                       guide = guide_colorbar(
+                         barwidth = unit(10, "cm"),  
+                         barheight = unit(0.3, "cm") 
+                         )) +
+  theme(legend.position = 'top') +
+  labs(fill = 'Chronic lower respiratory diseases (2021)') +
+  guides(
+    fill = guide_colorbar(
+      title.position = "top", 
+      title.hjust = 0.5,      
+      barwidth = unit(10, "cm"),
+      barheight = unit(0.3, "cm")
+    )
+  ) +
+  theme(
+    legend.position = "top",
+    legend.title = element_text(size = 8, face = "bold"),
+    legend.text  = element_text(size = 8)
+  )
+
+
+p3 <- plot_usmap(data = df_2021, 
+                 regions = "states", 
+                 values = "Weighted COVID") + 
+  scale_fill_viridis_c(option = "A",
+                       na.value = "lightgrey",
+                       guide = guide_colorbar(
+                         barwidth = unit(10, "cm"),  
+                         barheight = unit(0.3, "cm") 
+                         )) +
+  theme(legend.position = 'top') +
+  labs(fill = 'COVID (2021)') +
+  guides(
+    fill = guide_colorbar(
+      title.position = "top", 
+      title.hjust = 0.5,      
+      barwidth = unit(10, "cm"),
+      barheight = unit(0.3, "cm")
+    )
+  ) +
+  theme(
+    legend.position = "top",
+    legend.title = element_text(size = 8, face = "bold"),
+    legend.text  = element_text(size = 8)
+  )
+
+
+p4 <- plot_usmap(data = df_2023, 
+                 regions = "states", 
+                 values = "Weighted Unclassified symptoms, signs and abnormal findings") + 
+  scale_fill_viridis_c(option = "F",
+                       na.value = "lightgrey",
+                       guide = guide_colorbar(
+                         barwidth = unit(10, "cm"),  
+                         barheight = unit(0.3, "cm") 
+                         )) +
+  theme(legend.position = 'top') +
+  labs(fill = 'Unclassified symptoms, signs and abnormal findings Mortality (2023)') +
+  guides(
+    fill = guide_colorbar(
+      title.position = "top", 
+      title.hjust = 0.5,      
+      barwidth = unit(10, "cm"),
+      barheight = unit(0.3, "cm")
+    )
+  ) +
+  theme(
+    legend.position = "top",
+    legend.title = element_text(size = 8, face = "bold"),
+    legend.text  = element_text(size = 8)
+  )
+
+p5 <- plot_usmap(data = df_2021, 
+                 regions = "states", 
+                 values = "Weighted Diseases of heart") + 
+  scale_fill_viridis_c(option = "E",
+                       na.value = "lightgrey",
+                       guide = guide_colorbar(
+                         barwidth = unit(10, "cm"),  
+                         barheight = unit(0.3, "cm") 
+                         )) +
+  theme(legend.position = 'top') +
+  labs(fill = 'Diseases of heart (2021)') +
+  guides(
+    fill = guide_colorbar(
+      title.position = "top", 
+      title.hjust = 0.5,      
+      barwidth = unit(10, "cm"),
+      barheight = unit(0.3, "cm")
+    )
+  ) +
+  theme(
+    legend.position = "top",
+    legend.title = element_text(size = 8, face = "bold"),
+    legend.text  = element_text(size = 8)
+  )
+
+top <- plot_grid(
+  p1,
+  labels = c("A."),
+  label_size = 8, 
+  ncol = 1, align = "hv")
+
+bottom <- plot_grid(
+  p2,
+  p3,
+  p4,
+  p5,
+  labels = c("B.", "C.", 
+             "D.", "E"),
+  label_size = 8, 
+  ncol = 2, align = "hv")
+
+plot_grid(
+  top,
+  bottom,
+  ncol = 1,
+  align = "v",
+  rel_heights = c(1, 2)
+)
+
+rm(df_2021, df_2023, p1, p2, p3, p4, p5, top, bottom)
+```
+
+## **Conclusion**
+
+Here, I examined mortality trends in the United States between 2014-2023 across multiple causes of death, in terms of geographical and temporal patterns. Overall, mortality for most diseases increased during the COVID-19 period. Mortality from unclassified symptoms, signs, and abnorfmal findings increased sharply in 2023. There is clear seasonal patterns, with mortality lowest in summer and peak in winter. The winter of 2020-2021 showed peaks of the COVID-19 pandemic impact. Geographically, there is disproportionately high mortality in southeastern United States, particularly West Virginia, Alabama, Mississippi, across multiple causes of deaths.
+
+## **Limitation**
+
+\(1\) Lack of individual level data. Unable to investigate how COVID affect different age groups, race, sex, SES, etc. (2) Lack of analysis on flags for other diseases/complications. (3) Limited reporting in 2023.
+
+## **Disclosure of AI Usage**
+
+I used ChatGPT to (1) Revise regular expression, highlight what's wrong and why it won't work, (2) Find a simpler way to do `mutate` and then `select` (ChatGPT: `transmute`), (3) Set column width in `kable` (ChatGPT: `column_spec(1, width = "10cm")`), (4) Find simpler way to `mutate` parameters across multiple columns rather than running `mutate` for a million times (ChatGPT: `across(all_of(disease_order), ~ as.numeric(gsub(",", "", .x)), .names = "{col}")`), (5) Search how to change text alignment and add caption in `qmd`, (6) check grammar.
+:::
