@@ -370,7 +370,7 @@ kable(df %>%
           `Mean`         = format(round(mean(`All Cause`, na.rm = TRUE),0), big.mark=","),
           `3rd quartile` = format(round(quantile(`All Cause`, 0.75, na.rm = TRUE),0), 
                                   big.mark=","),
-          `Max (Mo.)`    = paste0(format(round(min(`All Cause`, na.rm = TRUE), 0), 
+          `Max (Mo.)`    = paste0(format(round(max(`All Cause`, na.rm = TRUE), 0), 
                                          big.mark=","),
                                   " (", Month[which.max(`All Cause`)], ".)"),
           `Mean (SD)`    = paste0(Mean, " (", round(sd(`All Cause`,na.rm = TRUE), 0), ")")) %>%
