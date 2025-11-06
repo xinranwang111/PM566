@@ -1,0 +1,446 @@
+---
+title: "Assignment2"
+author: "Xinran Wang"
+editor: visual
+format: 
+  html:
+    embed-resources: true
+fig-width: 8
+fig-height: 6
+theme: cosmos
+---
+
+## Due Date
+
+This assignment is due by 11:59pm Pacific Time on Friday, November 7th, 2025.
+
+```{r}
+suppressPackageStartupMessages(library(knitr))
+
+suppressPackageStartupMessages(library(data.table))
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(datasauRus))
+suppressPackageStartupMessages(library(tidytext))
+suppressPackageStartupMessages(library(forcats))
+suppressPackageStartupMessages(library(textdata))
+
+suppressPackageStartupMessages(library(skimr))
+
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(ggthemes))
+suppressPackageStartupMessages(library(ggpubr))
+suppressPackageStartupMessages(library(ggmap))
+suppressPackageStartupMessages(library(RColorBrewer))
+suppressPackageStartupMessages(library(leaflet))
+
+suppressPackageStartupMessages(library(cowplot))
+suppressPackageStartupMessages(library(scales))
+
+suppressPackageStartupMessages(library(lubridate))
+```
+
+```{r}
+idir <- "/Users/xinranwang/Documents/Course/25Fall/PM566/Data"
+```
+
+## Text Mining
+
+We have a USCbiostats repository for storing data called `data-science-data`. Navigate to the page for dataset `03_pubmed` (<https://github.com/USCbiostats/data-science-data/tree/master/03_pubmed>) and download the `pubmed.csv` dataset. This dataset contains 3,241 abstracts from articles collected via 5 PubMed searches. The search terms are listed in the second column, `term` and these will serve as the "documents." Your job is to analyze these abstracts to find interesting insights.
+
+```{r}
+df <- fread(paste0(idir, "/", "pubmed.csv"))
+```
+
+**Q1.** (15 points) How many abstracts are associated with each search term? Tokenize the abstracts and count the number of each token. Do you see anything interesting? What are the 5 most common tokens for each search term?
+
+```{r}
+kable(table(df$term), align = "c", caption = "Number of abstracts associated with each search term")
+```
+
+```{r}
+df |>
+  unnest_tokens(token, abstract) |>
+  group_by(term) |>
+  count(token) |>
+  top_n(5, n) |>
+  kable(align = "c",
+        caption = "5 most common tokens for each search term")
+```
+
+```{r}
+#| fig-width: 8
+#| fig-height: 3.2
+#| fig-align: center
+
+plot_distribution <- function(term_name, term_color){
+  df |>
+    unnest_tokens(token, abstract) |>
+    filter(term == term_name) |>
+    count(token) |>
+    top_n(5, n) |>
+    ggplot(aes(n, fct_reorder(token, n))) +
+    geom_col(fill = term_color[[term_name]]) +
+    labs(x = "Word Count", y = term_name) +
+    theme_minimal()
+}
+
+term_color <- setNames(RColorBrewer::brewer.pal(length(unique(df$term)), "Set2"), unique(df$term))
+
+plot_list <- lapply(unique(df$term), plot_distribution, term_color)
+
+main_plot <- plot_grid(
+  plotlist = plot_list,
+  ncol= 3
+  )
+
+plot_grid(
+  plotlist = main_plot,
+  ncol=1,
+  label_size = 8,                           
+  label_fontface = "bold", 
+  rel_heights = c(1, 0.1)
+)
+
+rm(main_plot, plot_list, plot_distribution)
+```
+
+[I didn't really see anything interesting. The most common tokens are either stop words or disease names.]{style="color:blue"}
+
+**Q2.** (15 points) Does removing stop words change what tokens appear as the most frequent? What are the 5 most common tokens for each search term after removing stop words?
+
+```{r}
+df |>
+  unnest_tokens(token, abstract) |>
+  group_by(term) |>
+  anti_join(stop_words, by = c("token" = "word")) |>
+  count(token) |>
+  top_n(5, n) |>
+  kable(align = "c",
+        caption = "5 most common tokens for each search term (after removing stop words)")
+```
+
+```{r}
+#| fig-width: 8
+#| fig-height: 3.2
+#| fig-align: center
+
+plot_distribution <- function(term_name, term_color){
+  df |>
+    unnest_tokens(token, abstract) |>
+    filter(term == term_name) |>
+    anti_join(stop_words, by = c("token" = "word")) |>
+    count(token) |>
+    top_n(5, n) |>
+    ggplot(aes(n, fct_reorder(token, n))) +
+    geom_col(fill = term_color[[term_name]]) +
+    labs(x = "Word Count", y = term_name) +
+    theme_minimal()
+}
+
+plot_list <- lapply(unique(df$term), plot_distribution, term_color)
+
+main_plot <- plot_grid(
+  plotlist = plot_list,
+  ncol= 3
+  )
+
+plot_grid(
+  plotlist = main_plot,
+  ncol=1,
+  label_size = 8,                           
+  label_fontface = "bold", 
+  rel_heights = c(1, 0.1)
+)
+
+rm(main_plot, plot_list, plot_distribution)
+```
+
+[Removing stop words changed the most frequent tokens.]{style="color:blue"}
+
+**Q3.** (10 points) Tokenize the abstracts into bigrams. Find the 10 most common bigrams and visualize them.
+
+```{r}
+df |>
+  unnest_ngrams(ngram, abstract, n = 2) |>
+  count(term, ngram) |>
+  group_by(term) |>
+  top_n(10, n) |>
+  ungroup() |>
+  kable(align = "c",
+        caption = "10 most common bigrams")
+```
+
+```{r}
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+
+plot_distribution <- function(term_name, term_color){
+  df |>
+    unnest_ngrams(ngram, abstract, n = 2) |>
+    count(ngram) |>
+    top_n(10, n) |>
+    ggplot(aes(n, fct_reorder(ngram, n))) +
+    geom_col(fill = term_color[[term_name]]) +
+    labs(x = "Bigram Count", y = term_name) +
+    theme_minimal()
+}
+
+plot_list <- lapply(unique(df$term), plot_distribution, term_color)
+
+main_plot <- plot_grid(
+  plotlist = plot_list,
+  ncol= 2
+  )
+
+plot_grid(
+  plotlist = main_plot,
+  ncol=1,
+  label_size = 8,                           
+  label_fontface = "bold", 
+  rel_heights = c(1, 0.1)
+)
+
+rm(main_plot, plot_list, plot_distribution)
+```
+
+[Here, I noticed that some bigrams include stop words. Thus, I removed stop words before identifying bigrams:]{style="color:blue"}
+
+```{r}
+df |>
+  unnest_tokens(token, abstract) |>
+  group_by(term) |>
+  anti_join(stop_words, by = c("token" = "word")) |>
+  summarise(abstract = paste(token, collapse = " ")) |> 
+  unnest_ngrams(ngram, abstract, n = 2) |>
+  count(term, ngram) |>
+  group_by(term) |>
+  top_n(10, n) |>
+  ungroup() |>
+  kable(align = "c",
+        caption = "10 most common bigrams after removing stop words")
+```
+
+```{r}
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+
+plot_distribution <- function(term_name, term_color){
+  df |>
+    unnest_tokens(token, abstract) |>
+    filter(term == term_name) |>
+    anti_join(stop_words, by = c("token" = "word")) |>
+    summarise(abstract = paste(token, collapse = " ")) |> 
+    unnest_ngrams(ngram, abstract, n = 2) |>
+    count(ngram) |>
+    top_n(10, n) |>
+    ggplot(aes(n, fct_reorder(ngram, n))) +
+    geom_col(fill = term_color[[term_name]]) +
+    labs(x = "Bigram Count", y = term_name)
+}
+
+plot_list <- lapply(unique(df$term), plot_distribution, term_color)
+
+main_plot <- plot_grid(
+  plotlist = plot_list,
+  ncol= 2
+  )
+
+plot_grid(
+  plotlist = main_plot,
+  ncol=1,
+  label_size = 8,                           
+  label_fontface = "bold", 
+  rel_heights = c(1, 0.1)
+)
+
+rm(main_plot, plot_list, plot_distribution)
+```
+
+**Q4.** (20 points) Calculate the TF-IDF value for each word-search term combination (here you want the search term to be the "document"). What are the 5 tokens from each search term with the highest TF-IDF value? How are the results different from the answers you got in Question 1?
+
+```{r}
+kable(cbind(
+  df |>
+  unnest_tokens(token, abstract) |>
+  count(term, token) |>
+  bind_tf_idf(token, term, n) |>
+  group_by(term) |>
+  top_n(5, tf_idf) |>
+  arrange(desc(tf_idf)) |>
+  ungroup() |> 
+  arrange(term) |>
+  transmute(Q4_term = term,
+            Q4_token = token,
+            Q4_n = n, 
+            Q4_tf_idf = tf_idf),
+  df |>
+  unnest_tokens(token, abstract) |>
+  group_by(term) |>
+  count(token) |>
+  top_n(5, n) |> 
+  ungroup() |>
+  transmute(Q1_term = term,
+            Q1_token = token,
+            Q1_n = n)), 
+  align = "c", 
+  caption = "5 tokens from each search term with the highest TF-IDF value (Q4) vs 5 most frequent tokens from each seqrch term (Q1)")
+```
+
+```{r}
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+
+plot_distribution <- function(term_name, term_color){
+  df |>
+    unnest_tokens(token, abstract) |>
+    filter(term == term_name) |>
+    count(token) |>
+    top_n(5, n) |>
+    ggplot(aes(n, fct_reorder(token, n))) +
+    geom_col(fill = term_color[[term_name]]) +
+    labs(x = "Q1 Word Count", y = term_name) +
+    theme_minimal()
+}
+
+plot_distribution_tfidf <- function(term_name, term_color){
+  df |>
+    unnest_tokens(token, abstract) |>
+    count(term, token) |>
+    bind_tf_idf(token, term, n) |>
+    group_by(term) |>
+    top_n(5, tf_idf) |>
+    arrange(desc(tf_idf)) |>
+    ungroup() |> 
+    arrange(term) |>
+    transmute(Q4_term = term,
+              Q4_token = token,
+              Q4_n = n, 
+              Q4_tf_idf = tf_idf) |>
+    filter(Q4_term == term_name) |>
+    ggplot(aes(x = Q4_tf_idf, y = fct_reorder(Q4_token, Q4_tf_idf))) +
+    geom_col(fill = term_color[[term_name]]) +
+    labs(x = "Q4 TF/IDF", y = term_name) +
+    theme_minimal()
+}
+
+plot_distribution_tfidf_count <- function(term_name, term_color){
+  df |>
+    unnest_tokens(token, abstract) |>
+    count(term, token) |>
+    bind_tf_idf(token, term, n) |>
+    group_by(term) |>
+    top_n(5, tf_idf) |>
+    arrange(desc(tf_idf)) |>
+    ungroup() |> 
+    arrange(term) |>
+    transmute(Q4_term = term,
+              Q4_token = token,
+              Q4_n = n, 
+              Q4_tf_idf = tf_idf) |>
+    filter(Q4_term == term_name) |>
+    ggplot(aes(x = Q4_n, y = fct_reorder(Q4_token, Q4_tf_idf))) +
+    geom_col(fill = term_color[[term_name]]) +
+    labs(x = "Q4 TF/IDF Word Count", y = term_name) +
+    theme_minimal()
+}
+
+plot_list       <- lapply(unique(df$term), plot_distribution, term_color)
+plot_list_tfidf <- lapply(unique(df$term), plot_distribution_tfidf, term_color)
+plot_list_tfidf_count <- lapply(unique(df$term), plot_distribution_tfidf_count, term_color)
+
+
+main_plot <- plot_grid(
+  plotlist = plot_list,
+  align = "v",
+  ncol= 1
+  )
+
+main_plot_tfidf <- plot_grid(
+  plotlist = plot_list_tfidf,
+  align = "v",
+  ncol= 1
+  )
+
+main_plot_tfidf_count <- plot_grid(
+  plotlist = plot_list_tfidf_count,
+  align = "v",
+  ncol= 1
+  )
+
+plot_grid(
+  plotlist = list(main_plot_tfidf, main_plot_tfidf_count, main_plot),
+  align = "vh",
+  ncol=3,
+  label_size = 8,                           
+  label_fontface = "bold",
+  rel_widths = c(1.1, 1, 1)
+)
+
+rm(main_plot, plot_list, plot_distribution, main_plot_tfidf, plot_list_tfidf, plot_distribution_tfidf, main_plot_tfidf_count, plot_list_tfidf_count, plot_distribution_tfidf_count)
+```
+
+[Comparing to word count from Q1 (where tokens identified purely by word frequency), the tokens with highest TF/IDF are less frequent but more meaningful and search term specific.]{style="color:blue"}
+
+## Sentiment Analysis
+
+**Q5.** (20 points) Perform a sentiment analysis using the NRC lexicon. What is the most common sentiment for each search term? What if you remove `"positive"` and `"negative"` from the list?s
+
+```{r}
+df |>
+  unnest_tokens(token, abstract) |>
+  inner_join(get_sentiments("nrc"), by = c("token" = "word")) |>
+  group_by(term, sentiment) |>
+  summarise(n = n()) |>
+  ungroup() |>
+  group_by(term) |>
+  top_n(1, n) |>
+  ungroup() |>
+  kable(align = "c", 
+        caption = "Most common sentiment for each search term")
+```
+
+```{r}
+df |>
+  unnest_tokens(token, abstract) |>
+  inner_join(get_sentiments("nrc") |>
+               filter(sentiment != "positive" & sentiment != "negative" ), 
+             by = c("token" = "word")) |>
+  group_by(term, sentiment) |>
+  summarise(n = n()) |>
+  ungroup() |>
+  group_by(term) |>
+  top_n(1, n) |>
+  ungroup() |>
+  kable(align = "c",
+        caption = "Most common sentiment for each search term after removing 'positive' and 'negative'")
+```
+
+**Q6.** (20 points) Now perform a sentiment analysis using the AFINN lexicon to get an average positivity score for each abstract (hint: you may want to create a variable that indexes, or counts, the abstracts). Create a visualization that shows these scores grouped by search term. Are any search terms noticeably different from the others?
+
+```{r}
+#| fig-width: 8
+#| fig-height: 3
+#| fig-align: center
+
+ggplot(
+  df |>
+    mutate(abstract_id = row_number()) %>%  
+    unnest_tokens(token, abstract) |>
+    inner_join(get_sentiments("afinn"), by = c("token" = "word")) |> 
+    group_by(term, abstract_id) |> 
+    summarise(mean_sentiment = mean(value),
+              sd_sentiment = sd(value)) |> 
+    ungroup(),
+  aes(x = term, y = mean_sentiment, fill = term)) +
+  geom_boxplot() +
+  geom_hline(yintercept = 0, color = "red", linewidth = 0.5) +
+  scale_fill_manual(values = term_color) +
+  labs(x = "Term", y = "Mean AFINN sentiment per abstract") +
+  theme_minimal()
+
+```
+
+[Crystic fibrosis search term shows a positive mean AFINN score, while other search terms have negative mean AFINN score.]{style="color:blue"}
