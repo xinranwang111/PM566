@@ -1,5 +1,5 @@
 ---
-title: "Assignment2"
+title: "Assignment3"
 author: "Xinran Wang"
 editor: visual
 format: 
@@ -54,7 +54,9 @@ df <- fread(paste0(idir, "/", "pubmed.csv"))
 **Q1.** (15 points) How many abstracts are associated with each search term? Tokenize the abstracts and count the number of each token. Do you see anything interesting? What are the 5 most common tokens for each search term?
 
 ```{r}
-kable(table(df$term), align = "c", caption = "Number of abstracts associated with each search term")
+kable(table(df$term),
+      align = "c", 
+      caption = "Number of abstracts associated with each search term")
 ```
 
 ```{r}
@@ -63,6 +65,10 @@ df |>
   group_by(term) |>
   count(token) |>
   top_n(5, n) |>
+  arrange(term, desc(n)) |>
+  summarise(
+    `Tokens (N)` = paste0(token, " (", n, ")", collapse = ", ")) |>
+  ungroup() |>
   kable(align = "c",
         caption = "5 most common tokens for each search term")
 ```
@@ -115,6 +121,10 @@ df |>
   anti_join(stop_words, by = c("token" = "word")) |>
   count(token) |>
   top_n(5, n) |>
+  arrange(term, desc(n)) |>
+  summarise(
+    `Tokens (N)` = paste0(token, " (", n, ")", collapse = ", ")) |>
+  ungroup() |>
   kable(align = "c",
         caption = "5 most common tokens for each search term (after removing stop words)")
 ```
@@ -165,6 +175,9 @@ df |>
   count(term, ngram) |>
   group_by(term) |>
   top_n(10, n) |>
+  arrange(term, desc(n)) |>
+  summarise(
+    `Tokens (N)` = paste0(ngram, " (", n, ")", collapse = ", ")) |>
   ungroup() |>
   kable(align = "c",
         caption = "10 most common bigrams")
@@ -216,6 +229,9 @@ df |>
   count(term, ngram) |>
   group_by(term) |>
   top_n(10, n) |>
+  arrange(term, desc(n)) |>
+  summarise(
+    `Tokens (N)` = paste0(ngram, " (", n, ")", collapse = ", ")) |>
   ungroup() |>
   kable(align = "c",
         caption = "10 most common bigrams after removing stop words")
@@ -269,21 +285,21 @@ kable(cbind(
   group_by(term) |>
   top_n(5, tf_idf) |>
   arrange(desc(tf_idf)) |>
+  summarise(
+    `Q4 Tokens (N; TF/IDF)` = paste0(token, " (", n, "; ", round(tf_idf, 5), ")", collapse = ", ")) |>
   ungroup() |> 
-  arrange(term) |>
   transmute(Q4_term = term,
-            Q4_token = token,
-            Q4_n = n, 
-            Q4_tf_idf = tf_idf),
+            `Q4 Tokens (N; TF/IDF)`),
   df |>
   unnest_tokens(token, abstract) |>
   group_by(term) |>
   count(token) |>
   top_n(5, n) |> 
+  arrange(term, desc(n)) |>
+  summarise(
+    `Q1 Tokens (N)` = paste0(token, " (", n, ")", collapse = ", ")) |>
   ungroup() |>
-  transmute(Q1_term = term,
-            Q1_token = token,
-            Q1_n = n)), 
+  transmute(`Q1 Tokens (N)`)), 
   align = "c", 
   caption = "5 tokens from each search term with the highest TF-IDF value (Q4) vs 5 most frequent tokens from each seqrch term (Q1)")
 ```
@@ -397,6 +413,7 @@ df |>
   ungroup() |>
   group_by(term) |>
   top_n(1, n) |>
+  arrange(desc(n)) |>
   ungroup() |>
   kable(align = "c", 
         caption = "Most common sentiment for each search term")
@@ -413,6 +430,7 @@ df |>
   ungroup() |>
   group_by(term) |>
   top_n(1, n) |>
+  arrange(desc(n)) |>
   ungroup() |>
   kable(align = "c",
         caption = "Most common sentiment for each search term after removing 'positive' and 'negative'")
@@ -443,4 +461,6 @@ ggplot(
 
 ```
 
-[Crystic fibrosis search term shows a positive mean AFINN score, while other search terms have negative mean AFINN score.]{style="color:blue"}
+[Cystic fibrosis search term shows a positive mean AFINN score, while other search terms have negative mean AFINN score.]{style="color:blue"}
+
+[The result here is not consistent with the previous finding, where the most common sentiment was anticipation for preeclampsia and disgust for cystic fibrosis. This discrepancy is likely because, instead of calculating average AFINN score for each abstract, the previous analysis summed the total sentiment across all abstracts .]{style="color:blue"}
