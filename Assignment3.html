@@ -3138,7 +3138,9 @@ vertical-align: -.125em;
 </div>
 <p><strong>Q1.</strong> (15 points) How many abstracts are associated with each search term? Tokenize the abstracts and count the number of each token. Do you see anything interesting? What are the 5 most common tokens for each search term?</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">table</span>(df<span class="sc">$</span>term), <span class="at">align =</span> <span class="st">&quot;c&quot;</span>, <span class="at">caption =</span> <span class="st">&quot;Number of abstracts associated with each search term&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">table</span>(df<span class="sc">$</span>term),</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">align =</span> <span class="st">&quot;c&quot;</span>, </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">&quot;Number of abstracts associated with each search term&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Number of abstracts associated with each search term</caption>
@@ -3179,143 +3181,45 @@ vertical-align: -.125em;
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(term) <span class="sc">|&gt;</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(token) <span class="sc">|&gt;</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">5</span>, n) <span class="sc">|&gt;</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">&quot;5 most common tokens for each search term&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(term, <span class="fu">desc</span>(n)) <span class="sc">|&gt;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Tokens (N)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">paste0</span>(token, <span class="st">&quot; (&quot;</span>, n, <span class="st">&quot;)&quot;</span>, <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">&quot;5 most common tokens for each search term&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>5 most common tokens for each search term</caption>
+<colgroup>
+<col style="width: 20%">
+<col style="width: 79%">
+</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: center;">term</th>
-<th style="text-align: center;">token</th>
-<th style="text-align: center;">n</th>
+<th style="text-align: center;">Tokens (N)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: center;">covid</td>
-<td style="text-align: center;">19</td>
-<td style="text-align: center;">7035</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">and</td>
-<td style="text-align: center;">6861</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">7275</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">of</td>
-<td style="text-align: center;">7668</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">the</td>
-<td style="text-align: center;">9741</td>
+<td style="text-align: center;">the (9741), of (7668), covid (7275), 19 (7035), and (6861)</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">and</td>
-<td style="text-align: center;">1777</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">in</td>
-<td style="text-align: center;">1497</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">of</td>
-<td style="text-align: center;">2304</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">the</td>
-<td style="text-align: center;">2677</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">to</td>
-<td style="text-align: center;">1011</td>
+<td style="text-align: center;">the (2677), of (2304), and (1777), in (1497), to (1011)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">a</td>
-<td style="text-align: center;">830</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">and</td>
-<td style="text-align: center;">1683</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">in</td>
-<td style="text-align: center;">1322</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">of</td>
-<td style="text-align: center;">2269</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">the</td>
-<td style="text-align: center;">2489</td>
+<td style="text-align: center;">the (2489), of (2269), and (1683), in (1322), a (830)</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">and</td>
-<td style="text-align: center;">5255</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">in</td>
-<td style="text-align: center;">3869</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">of</td>
-<td style="text-align: center;">6837</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">the</td>
-<td style="text-align: center;">7119</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">to</td>
-<td style="text-align: center;">2651</td>
+<td style="text-align: center;">the (7119), of (6837), and (5255), in (3869), to (2651)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">and</td>
-<td style="text-align: center;">4417</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">cancer</td>
-<td style="text-align: center;">3840</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">of</td>
-<td style="text-align: center;">5682</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">prostate</td>
-<td style="text-align: center;">3832</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">the</td>
-<td style="text-align: center;">6100</td>
+<td style="text-align: center;">the (6100), of (5682), and (4417), cancer (3840), prostate (3832)</td>
 </tr>
 </tbody>
 </table>
@@ -3368,143 +3272,45 @@ vertical-align: -.125em;
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(stop_words, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;token&quot;</span> <span class="ot">=</span> <span class="st">&quot;word&quot;</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(token) <span class="sc">|&gt;</span></span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">5</span>, n) <span class="sc">|&gt;</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">&quot;5 most common tokens for each search term (after removing stop words)&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(term, <span class="fu">desc</span>(n)) <span class="sc">|&gt;</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Tokens (N)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">paste0</span>(token, <span class="st">&quot; (&quot;</span>, n, <span class="st">&quot;)&quot;</span>, <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">&quot;5 most common tokens for each search term (after removing stop words)&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>5 most common tokens for each search term (after removing stop words)</caption>
+<colgroup>
+<col style="width: 17%">
+<col style="width: 82%">
+</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: center;">term</th>
-<th style="text-align: center;">token</th>
-<th style="text-align: center;">n</th>
+<th style="text-align: center;">Tokens (N)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: center;">covid</td>
-<td style="text-align: center;">19</td>
-<td style="text-align: center;">7035</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">7275</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">disease</td>
-<td style="text-align: center;">943</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">pandemic</td>
-<td style="text-align: center;">800</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">patients</td>
-<td style="text-align: center;">2293</td>
+<td style="text-align: center;">covid (7275), 19 (7035), patients (2293), disease (943), pandemic (800)</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">cf</td>
-<td style="text-align: center;">625</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">cystic</td>
-<td style="text-align: center;">862</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">disease</td>
-<td style="text-align: center;">400</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">fibrosis</td>
-<td style="text-align: center;">867</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">patients</td>
-<td style="text-align: center;">586</td>
+<td style="text-align: center;">fibrosis (867), cystic (862), cf (625), patients (586), disease (400)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">clinical</td>
-<td style="text-align: center;">187</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">csf</td>
-<td style="text-align: center;">206</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">meningeal</td>
-<td style="text-align: center;">219</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">429</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">patients</td>
-<td style="text-align: center;">446</td>
+<td style="text-align: center;">patients (446), meningitis (429), meningeal (219), csf (206), clinical (187)</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">eclampsia</td>
-<td style="text-align: center;">2005</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">pre</td>
-<td style="text-align: center;">2038</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">1863</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">pregnancy</td>
-<td style="text-align: center;">969</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">women</td>
-<td style="text-align: center;">1196</td>
+<td style="text-align: center;">pre (2038), eclampsia (2005), preeclampsia (1863), women (1196), pregnancy (969)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">cancer</td>
-<td style="text-align: center;">3840</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">disease</td>
-<td style="text-align: center;">652</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">patients</td>
-<td style="text-align: center;">934</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">prostate</td>
-<td style="text-align: center;">3832</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">treatment</td>
-<td style="text-align: center;">926</td>
+<td style="text-align: center;">cancer (3840), prostate (3832), patients (934), treatment (926), disease (652)</td>
 </tr>
 </tbody>
 </table>
@@ -3555,269 +3361,45 @@ vertical-align: -.125em;
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(term, ngram) <span class="sc">|&gt;</span></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(term) <span class="sc">|&gt;</span></span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">10</span>, n) <span class="sc">|&gt;</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">&quot;10 most common bigrams&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(term, <span class="fu">desc</span>(n)) <span class="sc">|&gt;</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Tokens (N)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">paste0</span>(ngram, <span class="st">&quot; (&quot;</span>, n, <span class="st">&quot;)&quot;</span>, <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">&quot;10 most common bigrams&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>10 most common bigrams</caption>
+<colgroup>
+<col style="width: 8%">
+<col style="width: 91%">
+</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: center;">term</th>
-<th style="text-align: center;">ngram</th>
-<th style="text-align: center;">n</th>
+<th style="text-align: center;">Tokens (N)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: center;">covid</td>
-<td style="text-align: center;">19 pandemic</td>
-<td style="text-align: center;">419</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">19 patients</td>
-<td style="text-align: center;">442</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">covid 19</td>
-<td style="text-align: center;">6969</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">in the</td>
-<td style="text-align: center;">943</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">of covid</td>
-<td style="text-align: center;">1519</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">of the</td>
-<td style="text-align: center;">1119</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">patients with</td>
-<td style="text-align: center;">718</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">the covid</td>
-<td style="text-align: center;">706</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">to the</td>
-<td style="text-align: center;">408</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">with covid</td>
-<td style="text-align: center;">576</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">and the</td>
-<td style="text-align: center;">132</td>
+<td style="text-align: center;">covid 19 (6969), of covid (1519), of the (1119), in the (943), patients with (718), the covid (706), with covid (576), 19 patients (442), 19 pandemic (419), to the (408)</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">859</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">fibrosis cf</td>
-<td style="text-align: center;">160</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">in the</td>
-<td style="text-align: center;">319</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">of cf</td>
-<td style="text-align: center;">114</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">of cystic</td>
-<td style="text-align: center;">168</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">of the</td>
-<td style="text-align: center;">452</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">patients with</td>
-<td style="text-align: center;">196</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">to the</td>
-<td style="text-align: center;">107</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">with cystic</td>
-<td style="text-align: center;">207</td>
+<td style="text-align: center;">cystic fibrosis (859), of the (452), in the (319), with cystic (207), patients with (196), of cystic (168), fibrosis cf (160), and the (132), of cf (114), to the (107)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">and the</td>
-<td style="text-align: center;">97</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">bacterial meningitis</td>
-<td style="text-align: center;">76</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">cerebrospinal fluid</td>
-<td style="text-align: center;">88</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">dura mater</td>
-<td style="text-align: center;">67</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">in the</td>
-<td style="text-align: center;">332</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">is a</td>
-<td style="text-align: center;">77</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">of the</td>
-<td style="text-align: center;">527</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">patients with</td>
-<td style="text-align: center;">163</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">to the</td>
-<td style="text-align: center;">76</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">year old</td>
-<td style="text-align: center;">66</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">and the</td>
-<td style="text-align: center;">283</td>
+<td style="text-align: center;">of the (527), in the (332), patients with (163), and the (97), cerebrospinal fluid (88), is a (77), bacterial meningitis (76), to the (76), dura mater (67), year old (66)</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">associated with</td>
-<td style="text-align: center;">279</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">for the</td>
-<td style="text-align: center;">270</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">in the</td>
-<td style="text-align: center;">1004</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">is a</td>
-<td style="text-align: center;">287</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">of pre</td>
-<td style="text-align: center;">588</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">of preeclampsia</td>
-<td style="text-align: center;">578</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">of the</td>
-<td style="text-align: center;">995</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">pre eclampsia</td>
-<td style="text-align: center;">1854</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">women with</td>
-<td style="text-align: center;">452</td>
+<td style="text-align: center;">pre eclampsia (1854), in the (1004), of the (995), of pre (588), of preeclampsia (578), women with (452), is a (287), and the (283), associated with (279), for the (270)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">and the</td>
-<td style="text-align: center;">241</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">cancer is</td>
-<td style="text-align: center;">295</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">for prostate</td>
-<td style="text-align: center;">222</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">in prostate</td>
-<td style="text-align: center;">294</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">in the</td>
-<td style="text-align: center;">820</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">of prostate</td>
-<td style="text-align: center;">870</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">of the</td>
-<td style="text-align: center;">790</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">patients with</td>
-<td style="text-align: center;">340</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">3222</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">with prostate</td>
-<td style="text-align: center;">229</td>
+<td style="text-align: center;">prostate cancer (3222), of prostate (870), in the (820), of the (790), patients with (340), cancer is (295), in prostate (294), and the (241), with prostate (229), for prostate (222)</td>
 </tr>
 </tbody>
 </table>
@@ -3869,284 +3451,45 @@ vertical-align: -.125em;
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(term, ngram) <span class="sc">|&gt;</span></span>
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(term) <span class="sc">|&gt;</span></span>
 <span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">10</span>, n) <span class="sc">|&gt;</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">&quot;10 most common bigrams after removing stop words&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(term, <span class="fu">desc</span>(n)) <span class="sc">|&gt;</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Tokens (N)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">paste0</span>(ngram, <span class="st">&quot; (&quot;</span>, n, <span class="st">&quot;)&quot;</span>, <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">&quot;10 most common bigrams after removing stop words&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>10 most common bigrams after removing stop words</caption>
+<colgroup>
+<col style="width: 5%">
+<col style="width: 94%">
+</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: center;">term</th>
-<th style="text-align: center;">ngram</th>
-<th style="text-align: center;">n</th>
+<th style="text-align: center;">Tokens (N)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: center;">covid</td>
-<td style="text-align: center;">19 infection</td>
-<td style="text-align: center;">267</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">19 pandemic</td>
-<td style="text-align: center;">439</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">19 patients</td>
-<td style="text-align: center;">492</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">2019 covid</td>
-<td style="text-align: center;">297</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">coronavirus disease</td>
-<td style="text-align: center;">361</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">cov 2</td>
-<td style="text-align: center;">299</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">covid 19</td>
-<td style="text-align: center;">6969</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">disease 2019</td>
-<td style="text-align: center;">281</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">patients covid</td>
-<td style="text-align: center;">364</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">sars cov</td>
-<td style="text-align: center;">317</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">cf patients</td>
-<td style="text-align: center;">66</td>
+<td style="text-align: center;">covid 19 (6969), 19 patients (492), 19 pandemic (439), patients covid (364), coronavirus disease (361), sars cov (317), cov 2 (299), 2019 covid (297), disease 2019 (281), 19 infection (267)</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">conductance regulator</td>
-<td style="text-align: center;">37</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">859</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">fibrosis cf</td>
-<td style="text-align: center;">160</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">fibrosis patients</td>
-<td style="text-align: center;">52</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">fibrosis transmembrane</td>
-<td style="text-align: center;">37</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">life expectancy</td>
-<td style="text-align: center;">37</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">lung disease</td>
-<td style="text-align: center;">40</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">patients cystic</td>
-<td style="text-align: center;">125</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">pulmonary function</td>
-<td style="text-align: center;">38</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">quality life</td>
-<td style="text-align: center;">43</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">transmembrane conductance</td>
-<td style="text-align: center;">38</td>
+<td style="text-align: center;">cystic fibrosis (859), fibrosis cf (160), patients cystic (125), cf patients (66), fibrosis patients (52), quality life (43), lung disease (40), pulmonary function (38), transmembrane conductance (38), conductance regulator (37), fibrosis transmembrane (37), life expectancy (37)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">bacterial meningitis</td>
-<td style="text-align: center;">76</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">central nervous</td>
-<td style="text-align: center;">48</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">cerebrospinal fluid</td>
-<td style="text-align: center;">88</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">cranial pachymeningitis</td>
-<td style="text-align: center;">51</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">dura mater</td>
-<td style="text-align: center;">67</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">hypertrophic cranial</td>
-<td style="text-align: center;">44</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">hypertrophic pachymeningitis</td>
-<td style="text-align: center;">43</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">idiopathic hypertrophic</td>
-<td style="text-align: center;">43</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">magnetic resonance</td>
-<td style="text-align: center;">61</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">nervous system</td>
-<td style="text-align: center;">52</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">resonance imaging</td>
-<td style="text-align: center;">57</td>
+<td style="text-align: center;">cerebrospinal fluid (88), bacterial meningitis (76), dura mater (67), magnetic resonance (61), resonance imaging (57), nervous system (52), cranial pachymeningitis (51), central nervous (48), hypertrophic cranial (44), hypertrophic pachymeningitis (43), idiopathic hypertrophic (43)</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">95 ci</td>
-<td style="text-align: center;">178</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">blood pressure</td>
-<td style="text-align: center;">212</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">morbidity mortality</td>
-<td style="text-align: center;">134</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">pre eclampsia</td>
-<td style="text-align: center;">1854</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">pre eclamptic</td>
-<td style="text-align: center;">136</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">pregnant women</td>
-<td style="text-align: center;">215</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">risk factors</td>
-<td style="text-align: center;">110</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">severe pre</td>
-<td style="text-align: center;">172</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">severe preeclampsia</td>
-<td style="text-align: center;">166</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">weeks gestation</td>
-<td style="text-align: center;">119</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">advanced prostate</td>
-<td style="text-align: center;">119</td>
+<td style="text-align: center;">pre eclampsia (1854), pregnant women (215), blood pressure (212), 95 ci (178), severe pre (172), severe preeclampsia (166), pre eclamptic (136), morbidity mortality (134), weeks gestation (119), risk factors (110)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">cancer patients</td>
-<td style="text-align: center;">116</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">castration resistant</td>
-<td style="text-align: center;">105</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">localized prostate</td>
-<td style="text-align: center;">114</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">3223</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">prostate specific</td>
-<td style="text-align: center;">172</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">radiation therapy</td>
-<td style="text-align: center;">102</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">radical prostatectomy</td>
-<td style="text-align: center;">166</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">specific antigen</td>
-<td style="text-align: center;">156</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">treatment prostate</td>
-<td style="text-align: center;">115</td>
+<td style="text-align: center;">prostate cancer (3223), prostate specific (172), radical prostatectomy (166), specific antigen (156), advanced prostate (119), cancer patients (116), treatment prostate (115), localized prostate (114), castration resistant (105), radiation therapy (102)</td>
 </tr>
 </tbody>
 </table>
@@ -4200,271 +3543,63 @@ vertical-align: -.125em;
 <span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(term) <span class="sc">|&gt;</span></span>
 <span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">5</span>, tf_idf) <span class="sc">|&gt;</span></span>
 <span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(tf_idf)) <span class="sc">|&gt;</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(term) <span class="sc">|&gt;</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">Q4_term =</span> term,</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">Q4_token =</span> token,</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">Q4_n =</span> n, </span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">Q4_tf_idf =</span> tf_idf),</span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">|&gt;</span></span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(token, abstract) <span class="sc">|&gt;</span></span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(term) <span class="sc">|&gt;</span></span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(token) <span class="sc">|&gt;</span></span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">5</span>, n) <span class="sc">|&gt;</span> </span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">Q1_term =</span> term,</span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>            <span class="at">Q1_token =</span> token,</span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>            <span class="at">Q1_n =</span> n)), </span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Q4 Tokens (N; TF/IDF)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">paste0</span>(token, <span class="st">&quot; (&quot;</span>, n, <span class="st">&quot;; &quot;</span>, <span class="fu">round</span>(tf_idf, <span class="dv">5</span>), <span class="st">&quot;)&quot;</span>, <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">Q4_term =</span> term,</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Q4 Tokens (N; TF/IDF)</span><span class="st">`</span>),</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">|&gt;</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(token, abstract) <span class="sc">|&gt;</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(term) <span class="sc">|&gt;</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(token) <span class="sc">|&gt;</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">5</span>, n) <span class="sc">|&gt;</span> </span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(term, <span class="fu">desc</span>(n)) <span class="sc">|&gt;</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Q1 Tokens (N)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">paste0</span>(token, <span class="st">&quot; (&quot;</span>, n, <span class="st">&quot;)&quot;</span>, <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="st">`</span><span class="at">Q1 Tokens (N)</span><span class="st">`</span>)), </span>
 <span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">&quot;c&quot;</span>, </span>
 <span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">&quot;5 tokens from each search term with the highest TF-IDF value (Q4) vs 5 most frequent tokens from each seqrch term (Q1)&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>5 tokens from each search term with the highest TF-IDF value (Q4) vs 5 most frequent tokens from each seqrch term (Q1)</caption>
 <colgroup>
-<col style="width: 20%">
-<col style="width: 20%">
 <col style="width: 7%">
-<col style="width: 13%">
-<col style="width: 20%">
-<col style="width: 11%">
-<col style="width: 7%">
+<col style="width: 61%">
+<col style="width: 30%">
 </colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: center;">Q4_term</th>
-<th style="text-align: center;">Q4_token</th>
-<th style="text-align: center;">Q4_n</th>
-<th style="text-align: center;">Q4_tf_idf</th>
-<th style="text-align: center;">Q1_term</th>
-<th style="text-align: center;">Q1_token</th>
-<th style="text-align: center;">Q1_n</th>
+<th style="text-align: center;">Q4 Tokens (N; TF/IDF)</th>
+<th style="text-align: center;">Q1 Tokens (N)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: center;">covid</td>
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">7275</td>
-<td style="text-align: center;">0.0597183</td>
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">19</td>
-<td style="text-align: center;">7035</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">pandemic</td>
-<td style="text-align: center;">800</td>
-<td style="text-align: center;">0.0065670</td>
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">and</td>
-<td style="text-align: center;">6861</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">coronavirus</td>
-<td style="text-align: center;">647</td>
-<td style="text-align: center;">0.0053110</td>
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">7275</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">sars</td>
-<td style="text-align: center;">372</td>
-<td style="text-align: center;">0.0030536</td>
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">of</td>
-<td style="text-align: center;">7668</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">cov</td>
-<td style="text-align: center;">334</td>
-<td style="text-align: center;">0.0027417</td>
-<td style="text-align: center;">covid</td>
-<td style="text-align: center;">the</td>
-<td style="text-align: center;">9741</td>
+<td style="text-align: center;">covid (7275; 0.05972), pandemic (800; 0.00657), coronavirus (647; 0.00531), sars (372; 0.00305), cov (334; 0.00274)</td>
+<td style="text-align: center;">the (9741), of (7668), covid (7275), 19 (7035), and (6861)</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">cf</td>
-<td style="text-align: center;">625</td>
-<td style="text-align: center;">0.0116541</td>
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">and</td>
-<td style="text-align: center;">1777</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">fibrosis</td>
-<td style="text-align: center;">867</td>
-<td style="text-align: center;">0.0090127</td>
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">in</td>
-<td style="text-align: center;">1497</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">cystic</td>
-<td style="text-align: center;">862</td>
-<td style="text-align: center;">0.0089608</td>
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">of</td>
-<td style="text-align: center;">2304</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">cftr</td>
-<td style="text-align: center;">86</td>
-<td style="text-align: center;">0.0028167</td>
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">the</td>
-<td style="text-align: center;">2677</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">sweat</td>
-<td style="text-align: center;">83</td>
-<td style="text-align: center;">0.0027184</td>
-<td style="text-align: center;">cystic fibrosis</td>
-<td style="text-align: center;">to</td>
-<td style="text-align: center;">1011</td>
+<td style="text-align: center;">cf (625; 0.01165), fibrosis (867; 0.00901), cystic (862; 0.00896), cftr (86; 0.00282), sweat (83; 0.00272)</td>
+<td style="text-align: center;">the (2677), of (2304), and (1777), in (1497), to (1011)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">429</td>
-<td style="text-align: center;">0.0147974</td>
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">a</td>
-<td style="text-align: center;">830</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">meningeal</td>
-<td style="text-align: center;">219</td>
-<td style="text-align: center;">0.0075539</td>
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">and</td>
-<td style="text-align: center;">1683</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">pachymeningitis</td>
-<td style="text-align: center;">149</td>
-<td style="text-align: center;">0.0051394</td>
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">in</td>
-<td style="text-align: center;">1322</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">csf</td>
-<td style="text-align: center;">206</td>
-<td style="text-align: center;">0.0040453</td>
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">of</td>
-<td style="text-align: center;">2269</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">meninges</td>
-<td style="text-align: center;">106</td>
-<td style="text-align: center;">0.0036562</td>
-<td style="text-align: center;">meningitis</td>
-<td style="text-align: center;">the</td>
-<td style="text-align: center;">2489</td>
+<td style="text-align: center;">meningitis (429; 0.0148), meningeal (219; 0.00755), pachymeningitis (149; 0.00514), csf (206; 0.00405), meninges (106; 0.00366)</td>
+<td style="text-align: center;">the (2489), of (2269), and (1683), in (1322), a (830)</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">eclampsia</td>
-<td style="text-align: center;">2005</td>
-<td style="text-align: center;">0.0229802</td>
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">and</td>
-<td style="text-align: center;">5255</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">1863</td>
-<td style="text-align: center;">0.0213527</td>
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">in</td>
-<td style="text-align: center;">3869</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">pregnancy</td>
-<td style="text-align: center;">969</td>
-<td style="text-align: center;">0.0035250</td>
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">of</td>
-<td style="text-align: center;">6837</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">maternal</td>
-<td style="text-align: center;">797</td>
-<td style="text-align: center;">0.0028993</td>
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">the</td>
-<td style="text-align: center;">7119</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">gestational</td>
-<td style="text-align: center;">191</td>
-<td style="text-align: center;">0.0021891</td>
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">to</td>
-<td style="text-align: center;">2651</td>
+<td style="text-align: center;">eclampsia (2005; 0.02298), preeclampsia (1863; 0.02135), pregnancy (969; 0.00353), maternal (797; 0.0029), gestational (191; 0.00219)</td>
+<td style="text-align: center;">the (7119), of (6837), and (5255), in (3869), to (2651)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">prostate</td>
-<td style="text-align: center;">3832</td>
-<td style="text-align: center;">0.0501967</td>
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">and</td>
-<td style="text-align: center;">4417</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">androgen</td>
-<td style="text-align: center;">305</td>
-<td style="text-align: center;">0.0039953</td>
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">cancer</td>
-<td style="text-align: center;">3840</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">psa</td>
-<td style="text-align: center;">282</td>
-<td style="text-align: center;">0.0036940</td>
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">of</td>
-<td style="text-align: center;">5682</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">prostatectomy</td>
-<td style="text-align: center;">215</td>
-<td style="text-align: center;">0.0028164</td>
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">prostate</td>
-<td style="text-align: center;">3832</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">castration</td>
-<td style="text-align: center;">148</td>
-<td style="text-align: center;">0.0019387</td>
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">the</td>
-<td style="text-align: center;">6100</td>
+<td style="text-align: center;">prostate (3832; 0.0502), androgen (305; 0.004), psa (282; 0.00369), prostatectomy (215; 0.00282), castration (148; 0.00194)</td>
+<td style="text-align: center;">the (6100), of (5682), and (4417), cancer (3840), prostate (3832)</td>
 </tr>
 </tbody>
 </table>
@@ -4579,9 +3714,10 @@ vertical-align: -.125em;
 <span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
 <span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(term) <span class="sc">|&gt;</span></span>
 <span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">1</span>, n) <span class="sc">|&gt;</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">align =</span> <span class="st">&quot;c&quot;</span>, </span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">&quot;Most common sentiment for each search term&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(n)) <span class="sc">|&gt;</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">align =</span> <span class="st">&quot;c&quot;</span>, </span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">&quot;Most common sentiment for each search term&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in inner_join(unnest_tokens(df, token, abstract), get_sentiments(&quot;nrc&quot;), : Detected an unexpected many-to-many relationship between `x` and `y`.
 ℹ Row 8 of `x` matches multiple rows in `y`.
@@ -4610,6 +3746,16 @@ vertical-align: -.125em;
 <td style="text-align: center;">9874</td>
 </tr>
 <tr class="even">
+<td style="text-align: center;">prostate cancer</td>
+<td style="text-align: center;">negative</td>
+<td style="text-align: center;">8918</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">preeclampsia</td>
+<td style="text-align: center;">positive</td>
+<td style="text-align: center;">8014</td>
+</tr>
+<tr class="even">
 <td style="text-align: center;">cystic fibrosis</td>
 <td style="text-align: center;">positive</td>
 <td style="text-align: center;">2747</td>
@@ -4618,16 +3764,6 @@ vertical-align: -.125em;
 <td style="text-align: center;">meningitis</td>
 <td style="text-align: center;">negative</td>
 <td style="text-align: center;">2109</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">positive</td>
-<td style="text-align: center;">8014</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">negative</td>
-<td style="text-align: center;">8918</td>
 </tr>
 </tbody>
 </table>
@@ -4644,9 +3780,10 @@ vertical-align: -.125em;
 <span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
 <span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(term) <span class="sc">|&gt;</span></span>
 <span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">1</span>, n) <span class="sc">|&gt;</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">&quot;Most common sentiment for each search term after removing &#39;positive&#39; and &#39;negative&#39;&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(n)) <span class="sc">|&gt;</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">align =</span> <span class="st">&quot;c&quot;</span>,</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">&quot;Most common sentiment for each search term after removing &#39;positive&#39; and &#39;negative&#39;&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in inner_join(unnest_tokens(df, token, abstract), filter(get_sentiments(&quot;nrc&quot;), : Detected an unexpected many-to-many relationship between `x` and `y`.
 ℹ Row 8 of `x` matches multiple rows in `y`.
@@ -4670,9 +3807,19 @@ vertical-align: -.125em;
 </thead>
 <tbody>
 <tr class="odd">
+<td style="text-align: center;">prostate cancer</td>
+<td style="text-align: center;">fear</td>
+<td style="text-align: center;">8118</td>
+</tr>
+<tr class="even">
 <td style="text-align: center;">covid</td>
 <td style="text-align: center;">fear</td>
 <td style="text-align: center;">7730</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">preeclampsia</td>
+<td style="text-align: center;">anticipation</td>
+<td style="text-align: center;">4780</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">cystic fibrosis</td>
@@ -4683,16 +3830,6 @@ vertical-align: -.125em;
 <td style="text-align: center;">meningitis</td>
 <td style="text-align: center;">fear</td>
 <td style="text-align: center;">1510</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">preeclampsia</td>
-<td style="text-align: center;">anticipation</td>
-<td style="text-align: center;">4780</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">prostate cancer</td>
-<td style="text-align: center;">fear</td>
-<td style="text-align: center;">8118</td>
 </tr>
 </tbody>
 </table>
@@ -4727,7 +3864,8 @@ vertical-align: -.125em;
 </div>
 </div>
 </div>
-<p><span style="color:blue">Crystic fibrosis search term shows a positive mean AFINN score, while other search terms have negative mean AFINN score.</span></p>
+<p><span style="color:blue">Cystic fibrosis search term shows a positive mean AFINN score, while other search terms have negative mean AFINN score.</span></p>
+<p><span style="color:blue">The result here is not consistent with the previous finding, where the most common sentiment was anticipation for preeclampsia and disgust for cystic fibrosis. This discrepancy is likely because, instead of calculating average AFINN score for each abstract, the previous analysis summed the total sentiment across all abstracts .</span></p>
 </section>
 
 </main>
