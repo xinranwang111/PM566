@@ -31,8 +31,6 @@
   - Script
   - Output
 - [Test Website](https://xinranwang111.github.io/Web-Test)
-  - Script
-  - Output
 
 ### Assignments
 - Assignment 1
