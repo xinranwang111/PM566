@@ -40,11 +40,11 @@
   - [Script](https://github.com/xinranwang111/PM566/blob/main/Assignment2.qmd)
   - [Output](https://github.com/xinranwang111/PM566/blob/main/Assignment2.html)
 - Assignment 3
-  - Script
-  - Output
+  - [Script](https://github.com/xinranwang111/PM566/blob/main/Assignment3.qmd)
+  - [Output](https://github.com/xinranwang111/PM566/blob/main/Assignment3.html)
 - Assignment 4
-  - Script
-  - Output
+  - [Script](https://github.com/xinranwang111/PM566/blob/main/Assignment4.qmd)
+  - [Output](https://github.com/xinranwang111/PM566/blob/main/Assignment4.html)
 
 ### Midterm & Final
 - Midterm
